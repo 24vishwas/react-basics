@@ -33,13 +33,14 @@ const Navbar = () => {
               <NavLink to="/" onClick={handleCloseNavbar}>Home</NavLink>
             </li>
             <li>
-              <NavLink to="/blog" onClick={handleCloseNavbar}>Blog</NavLink>
+                <NavLink to="/about" onClick={handleCloseNavbar}>About</NavLink>
+              
             </li>
             <li>
               <NavLink to="/project" onClick={handleCloseNavbar}>Projects</NavLink>
             </li>
             <li>
-              <NavLink to="/about" onClick={handleCloseNavbar}>About</NavLink>
+            <NavLink to="/blog" onClick={handleCloseNavbar}>Blog</NavLink>
             </li>
             <li>
               <NavLink to="/contact" onClick={handleCloseNavbar}>Contact</NavLink>
