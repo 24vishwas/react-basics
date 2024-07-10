@@ -37,11 +37,9 @@ const Navbar = () => {
               
             </li>
             <li>
-              <NavLink to="/project" onClick={handleCloseNavbar}>Projects</NavLink>
+              <NavLink to="/projects" onClick={handleCloseNavbar}>Projects</NavLink>
             </li>
-            <li>
-            <NavLink to="/blog" onClick={handleCloseNavbar}>Blog</NavLink>
-            </li>
+           
             <li>
               <NavLink to="/contact" onClick={handleCloseNavbar}>Contact</NavLink>
             </li>
