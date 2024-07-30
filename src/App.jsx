@@ -7,6 +7,7 @@ import About from './pages/about/About';
 import Home from './pages/home/Home';
 import Projects from './pages/projects/Projects';
 import Contact from './pages/contact/Contact';
+import Sidebar from './components/sidebar/Sidebar';
 
 
 function App() {
@@ -16,8 +17,11 @@ function App() {
     <>
     
       <div className="App">
+          <Sidebar />
+          <div className="main-content">
         <Navbar />
         <main>
+
           <Routes>
             <Route path="/" exact element={<Home/>} />
             <Route path="/about" element={<About/>} />
@@ -26,6 +30,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+          </div>
       </div>
     
     </>

@@ -7,3 +7,21 @@
   align-items: center;
   height: 100%;
 }
+
+.app{
+  display: flex;
+}
+.main-content {
+  flex: 1;
+  /* padding: 20px; */
+  /* margin-left: 250px; */
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar + .main-content {
+  margin-left: 0;
+}
+
+.sidebar.open + .main-content {
+  margin-left: 250px;
+}
