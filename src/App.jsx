@@ -8,6 +8,8 @@ import Home from './pages/home/Home';
 import Projects from './pages/projects/Projects';
 import Contact from './pages/contact/Contact';
 import Sidebar from './components/sidebar/Sidebar';
+import Login from './pages/Login/Login';
+import Register from './pages/Login/Register';
 
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
             <Route path="/about" element={<About/>} />
             <Route path="/projects" element={<Projects/>} />
             <Route path="/contact" element={<Contact/>} />
+            <Route path="/Login" element={<Login/>} />
+            <Route path="/Register" element={<Register/>} />
           </Routes>
         </main>
         <Footer />

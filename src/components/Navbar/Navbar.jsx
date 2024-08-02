@@ -43,6 +43,9 @@ const Navbar = () => {
             <li>
               <NavLink to="/contact" onClick={handleCloseNavbar}>Contact</NavLink>
             </li>
+            <li>
+              <NavLink to="/Login" onClick={handleCloseNavbar}>Login</NavLink>
+            </li>
           </ul>
       </div>
     </div>
