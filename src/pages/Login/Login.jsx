@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink } from 'react-router-dom';
-import bgimg from '../../assets/login-bg.jpg'
 import { FaUser, FaLock, FaSignInAlt } from 'react-icons/fa'; // Import the required icons
+import bgimg from '../../assets/login-bg.jpg';
+import { useAuth } from '../../auth/AuthContext';
 import "./Login.css";
 
 const formConfig = {
@@ -25,9 +26,9 @@ const formConfig = {
 };
 
 function Login() {
-  const [login, setLogin] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState("");
+  const [loggedin, setLoggedin] = useState(false);
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -36,20 +37,14 @@ function Login() {
 
   const onSubmit = (data) => {
     const userData = JSON.parse(localStorage.getItem(data.name));
-    if (userData) {
-      if (userData.password === data.password) {
-        console.log(userData.name + " You Are Successfully Logged In");
-        setLogin(true);
-        setLoggedInUser(userData.name);
-      } else {
-        console.log("Email or Password is not matching with our record");
-        setLogin(false);
-        setLoggedInUser("");
-      }
+    if (userData && userData.password === data.password) {
+      console.log(userData.firstName + " You Are Successfully Logged In");
+      alert(userData.firstName + " You Are Successfully Logged In")
+      login(userData);
+      setLoggedin(true);
     } else {
       console.log("Email or Password is not matching with our record");
-      setLogin(false);
-      setLoggedInUser("");
+      setLoggedin(false);
     }
     setSubmitted(true); // Set submitted to true when the form is submitted
   };
@@ -60,15 +55,12 @@ function Login() {
   };
 
   return (
-    <div>
-      
-     
     <div className="login-page">
       <div className="login-content">
         <h1>Logo</h1>
         {submitted && ( // Only show messages after form is submitted
-          login ? (
-            <p className="msg">{loggedInUser} is logged in  </p>
+          loggedin ? (
+            <p className="msg"> is logged in  </p>
           ) : (
             <p className="msg">Error no match found!</p>
           )
@@ -87,17 +79,14 @@ function Login() {
               </span>}
             </div>
           ))}
-          <button type="submit" className="submit-button"> <FaSignInAlt />LOGIN</button>
+          <button type="submit" className="submit-button"><FaSignInAlt /> LOGIN</button>
         </form>
         <p>Forgot password?</p>
-        <p>Dont have an account ? <NavLink className='register-link' to="/Register">Register here</NavLink> </p>
-        
-      
+        <p>Don't have an account? <NavLink className='register-link' to="/Register">Register here</NavLink></p>
       </div>
       <div className="img-container">
         <img src={bgimg} alt="background" />
       </div>
-    </div>
     </div>
   );
 }

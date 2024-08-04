@@ -19,7 +19,7 @@ function App() {
     <>
     
       <div className="App">
-          <Sidebar />
+          {/* <Sidebar /> */}
           <div className="main-content">
         <Navbar />
         <main>

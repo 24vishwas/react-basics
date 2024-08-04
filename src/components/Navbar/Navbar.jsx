@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AiFillMacCommand } from 'react-icons/ai';
 import { FiMenu, FiX } from 'react-icons/fi';
+import { useAuth } from '../../auth/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false);
+  const { user } = useAuth();
 
   const handleShowNavbar = () => {
     setShowNavbar(!showNavbar);
@@ -20,8 +22,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Projects', path: '/projects' },
-    { name: 'Contact', path: '/contact' },
-    { name: 'Login', path: '/login' }
+    { name: 'Contact', path: '/contact' }
   ];
 
   return (
@@ -42,6 +43,17 @@ const Navbar = () => {
                 </NavLink>
               </li>
             ))}
+            <li>
+              {user ? (
+                <NavLink to="/profile" className='nav-profile' onClick={handleCloseNavbar}>
+                  {user.firstName.charAt(0)}
+                </NavLink>
+              ) : (
+                <NavLink to="/login" onClick={handleCloseNavbar}>
+                  Login
+                </NavLink>
+              )}
+            </li>
           </ul>
         </div>
       </div>

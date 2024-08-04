@@ -27,6 +27,7 @@ body {
 .nav-elements ul {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   list-style-type: none;
 }
 
@@ -90,4 +91,15 @@ body {
       margin-right: unset;
       margin-top: 22px;
     }
+  }
+  .nav-profile{
+    background-color: #2f234f;
+    border-radius: 50%;
+    width: 50px;
+    display: inline-block;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white !important;
   }
