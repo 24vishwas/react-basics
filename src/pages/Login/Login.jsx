@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink } from 'react-router-dom';
+import bgimg from '../../assets/login-bg.jpg'
+import { FaUser, FaLock, FaSignInAlt } from 'react-icons/fa'; // Import the required icons
 import "./Login.css";
 
 const formConfig = {
@@ -9,13 +11,15 @@ const formConfig = {
       name: "name",
       type: "text",
       placeholder: "Name",
-      validation: { required: true }
+      validation: { required: true },
+      icon: "FaUser"
     },
     {
       name: "password",
       type: "password",
       placeholder: "Password",
-      validation: { required: true }
+      validation: { required: true },
+      icon: "FaLock"
     }
   ]
 };
@@ -50,35 +54,50 @@ function Login() {
     setSubmitted(true); // Set submitted to true when the form is submitted
   };
 
-  return (
-    <div className="login-page">
-      <p className="title">Login Form</p>
-      
-      <NavLink className="button" to="/Register">Register here</NavLink>
-      
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        {formConfig.fields.map((field, index) => (
-          <div key={index}>
-            <input
-              type={field.type}
-              placeholder={field.placeholder}
-              {...register(field.name, field.validation)}
-            />
-            {errors[field.name] && <span style={{ color: "red" }}>
-              *{field.placeholder}* is mandatory
-            </span>}
-          </div>
-        ))}
-        <input type="submit" style={{ backgroundColor: "#a1eafb" }} />
-      </form>
+  const iconComponents = {
+    FaUser: <FaUser />,
+    FaLock: <FaLock />
+  };
 
-      {submitted && ( // Only show messages after form is submitted
-        login ? (
-          <h1>{loggedInUser} is logged in</h1>
-        ) : (
-          <h2>Error no match found!</h2>
-        )
-      )}
+  return (
+    <div>
+      
+     
+    <div className="login-page">
+      <div className="login-content">
+        <h1>Logo</h1>
+        {submitted && ( // Only show messages after form is submitted
+          login ? (
+            <p className="msg">{loggedInUser} is logged in  </p>
+          ) : (
+            <p className="msg">Error no match found!</p>
+          )
+        )}
+        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+          {formConfig.fields.map((field, index) => (
+            <div key={index} className="input-container">
+              {field.icon && iconComponents[field.icon]}
+              <input
+                type={field.type}
+                placeholder={field.placeholder}
+                {...register(field.name, field.validation)}
+              />
+              {errors[field.name] && <span style={{ color: "red" }}>
+                *{field.placeholder}* is mandatory
+              </span>}
+            </div>
+          ))}
+          <button type="submit" className="submit-button"> <FaSignInAlt />LOGIN</button>
+        </form>
+        <p>Forgot password?</p>
+        <p>Dont have an account ? <NavLink className='register-link' to="/Register">Register here</NavLink> </p>
+        
+      
+      </div>
+      <div className="img-container">
+        <img src={bgimg} alt="background" />
+      </div>
+    </div>
     </div>
   );
 }

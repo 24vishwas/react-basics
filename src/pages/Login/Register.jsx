@@ -1,59 +1,134 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
-import './Login.css';
+import { NavLink } from 'react-router-dom';
+import bgimg from '../../assets/login-bg.jpg';
+import { FaUser, FaLock, FaSignInAlt, FaEnvelope, FaPhone, FaQuestionCircle, FaHome } from 'react-icons/fa';
+
+import './Register.css';
 
 const formConfig = {
-  fields: [
-    {
-      name: "name",
-      type: "text",
-      placeholder: "Name",
-      validation: { required: true }
-    },
-    {
-      name: "password",
-      type: "password",
-      placeholder: "Password",
-      validation: { required: true }
-    }
-  ]
+    fields: [
+        {
+            section: "Personal Details",
+            fields: [
+                { name: "firstName", type: "text", placeholder: "First Name", validation: { required: true }, icon: "FaUser" },
+                { name: "lastName", type: "text", placeholder: "Last Name", validation: { required: true }, icon: "FaUser" },
+                { name: "dob", type: "date", placeholder: "Date of Birth", validation: { required: true } },
+                { name: "address", type: "text", placeholder: "Address", validation: { required: true } },
+                { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
+            ],
+        },
+        {
+            section: "Account Details",
+            fields: [
+                { name: "email", type: "email", placeholder: "Email", validation: { required: true }, icon: "FaEnvelope" },
+                { name: "password", type: "password", placeholder: "Password", validation: { required: true }, icon: "FaLock" },
+                { name: "confirmPassword", type: "password", placeholder: "Confirm Password", validation: { required: true }, icon: "FaLock" },
+                { name: "securityQuestion1", type: "text", placeholder: "Security Question 1", validation: { required: true }, icon: "FaQuestionCircle" },
+                { name: "securityQuestion2", type: "text", placeholder: "Security Question 2", validation: { required: true }, icon: "FaQuestionCircle" },
+            ],
+        },
+        {
+            section: "Property Details",
+            fields: [
+                { name: "swimmingPool", type: "select", placeholder: "Swimming Pool", options: ["yes", "No"] },
+                { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
+                { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
+                { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
+            ],
+        },
+    ],
 };
 
 const Register = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const [submit, setSubmit] = useState(false);
+    const { register, handleSubmit, formState: { errors } } = useForm();
+    const [submit, setSubmit] = useState(false);
 
-  const onSubmit = (data) => {
-    localStorage.setItem(data.name, JSON.stringify({
-      name: data.name, password: data.password
-    }));
-    console.log(JSON.parse(localStorage.getItem(data.name)));
-    setSubmit(true);
-  };
+    const onSubmit = (data) => {
+        localStorage.setItem(data.firstName, JSON.stringify({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            dob: data.dob,
+            address: data.address,
+            phone: data.phone,
+            email: data.email,
+            password: data.password,
+            securityQuestion1: data.securityQuestion1,
+            securityQuestion2: data.securityQuestion2,
+            swimmingPool: data.swimmingPool,
+            houseType: data.houseType,
+            numRooms: data.numRooms,
+            numEVs: data.numEVs,
+        }));
+        console.log(JSON.parse(localStorage.getItem(data.firstName)));
+        setSubmit(true);
+    };
 
-  return (
-    <div className='login-page'>
-      <p className="title">Register Form</p>
+    const iconComponents = {
+        FaUser: <FaUser />,
+        FaLock: <FaLock />,
+        FaEnvelope: <FaEnvelope />,
+        FaPhone: <FaPhone />,
+        FaQuestionCircle: <FaQuestionCircle />,
+        FaHome: <FaHome />,
+    };
 
-      <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        {formConfig.fields.map((field, index) => (
-          <div key={index}>
-            <input
-              type={field.type}
-              placeholder={field.placeholder}
-              {...register(field.name, field.validation)}
-            />
-            {errors[field.name] && <span style={{ color: "red" }}>
-              *{field.placeholder}* is mandatory
-            </span>}
-          </div>
-        ))}
-        <input type="submit" style={{ backgroundColor: "#a1eafb" }} />
-      </form>
+    return (
+        <div className='register-page'>
+            <div className='register-content'>
+                <h1>Customer Registration</h1>
+                <p>Please fill all the your details and click on register - sample help text</p>
+                {submit && <p>Registered</p>}
+                <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
+                    {formConfig.fields.map((section, sectionIndex) => (
+                        <div key={sectionIndex} className="form-section">
+                            <h3>{section.section}</h3>
+                            <div className='form-section-wrapper'>
 
-      {submit && <h1>Registered</h1>}
-    </div>
-  );
-}
+                            
+                            {section.fields.map((field, index) => (
+                                <div key={index} className="fields-container">
+                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                    <div className="input-fields">
+                                    {field.icon && iconComponents[field.icon]}
+                                    {field.type === "select" ? (
+                                        <select {...register(field.name, field.validation)}>
+                                            {field.options.map((option, optIndex) => (
+                                                <option key={optIndex} value={option}>{option}</option>
+                                            ))}
+                                        </select>
+                                    ) : field.type === "checkbox" ? (
+                                        <label>
+                                            <input type="checkbox" {...register(field.name)} />
+                                            {field.placeholder}
+                                        </label>
+                                    ) : (
+                                        <input
+                                            type={field.type}
+                                            placeholder={field.placeholder}
+                                            {...register(field.name, field.validation)}
+                                        />
+                                    )}
+                                    {errors[field.name] && <span className='error-note'>
+                                        *{field.placeholder}* is mandatory
+                                    </span>}
+                                    </div>
+                                </div>
+                            ))}
+                            </div>
+                        </div>
+                    ))}
+                    <div className='button-container'>
+                    <button type="reset" className="submit-button reset-button"> Clear</button>
+                    <button type="submit" className="submit-button"> <FaSignInAlt /> Register</button>
+                    </div>
+                </form>
+                <p>Already have an account?</p>
+                <p><NavLink className='register-link' to="/Login">Login here</NavLink></p>
+            </div>
+           
+        </div>
+    );
+};
 
 export default Register;

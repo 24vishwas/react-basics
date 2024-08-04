@@ -16,21 +16,6 @@
    margin-bottom: 0;
 }
 
-.form {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    /* height: 100%; */
-    align-items: center;
-    justify-content: space-between;
-    /* max-width: 500px; */
-    /* width: 80%; */
-    padding-inline: 2vw;
-    /* background-color: rgb(190, 253, 204); */
-    border-radius: 0 0 10px 10px;
-}
-
 
 .button{
     width: 150px;
@@ -49,8 +34,11 @@
     text-align: center;
     color: red;
 }
-.login-page h1{
+.register-content h1{
     text-align: center  ;
+}
+.register-content p{
+    text-align: center;
 }
 .login-page{
     display: flex;
@@ -84,24 +72,26 @@
     margin-block: 10%;
 }
 
-.input-container {
+.register-content .input-fields {
     position: relative;
     display: flex;
-    align-items: center;
-    margin-bottom: 15px;
+    /* align-items: center; */
+    flex-direction: column;
+    /* margin-bottom: 15px; */
     width: 100%;
-    margin-block: 20px;
+    margin-bottom: 10px;
   }
   
-  .input-container svg {
+  .input-fields svg {
     position: absolute;
     left: 10px;
+    transform: translateY(70%);
     width: 20px;
     height: 20px;
     color: gray;
   }
   
-  .input-container input {
+  .input-fields input, .input-fields select {
     padding-left: 40px; /* Adjust padding to make space for the icon */
     width: 100%;
     padding: 10px;
@@ -112,7 +102,16 @@
     font-size: 1rem;
   }
   
-  
+  .error-note{
+    font-size: 0.7rem;
+    color: red;
+  }
+  .button-container{
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 20px;
+  }
   .submit-button{
     display: flex;
     align-items: center;
@@ -123,10 +122,13 @@
     border: none;
     color: white;
     font-size: 1rem;
-    width: 100%;
+    width: 150px;
     border-radius: 5px;
     margin-top: 20px;
   }
+.reset-button{
+    background-color: rgb(92, 121, 114);
+}
   .register-link{
     text-decoration: none;
     font-weight: 600;
@@ -137,6 +139,22 @@
     font-size: 0.8rem;
     color: gray;
   }
+.register-content{
+    width: 90%;
+    margin-inline: auto;
+}
+.form-section-wrapper{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    column-gap: 50px;
+    row-gap: 10px;
+    flex-wrap: wrap;
+}
+.form-section-wrapper .fields-container{
+    width: calc(30% - 50px);
+    min-width: 220px;
+}
 
 
 @media (max-width:767px) {
@@ -145,5 +163,15 @@
     }
     .login-content{
         width: 80%;
+    }
+    .form-section-wrapper .fields-container{
+        width: calc(50% - 50px) ;
+    }
+  
+}
+@media (max-width:600px) {
+    .form-section-wrapper .fields-container{
+        width: 100% ;
+        min-width: none;
     }
 }

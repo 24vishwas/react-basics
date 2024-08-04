@@ -1,56 +1,52 @@
-import React from 'react'
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-
-import { AiFillMacCommand } from "react-icons/ai";
-import { FiMenu, FiX } from "react-icons/fi";
-
-import './Navbar.css'
-
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { AiFillMacCommand } from 'react-icons/ai';
+import { FiMenu, FiX } from 'react-icons/fi';
+import './Navbar.css';
 
 const Navbar = () => {
-    const [showNavbar, setShowNavbar] = useState(false)
+  const [showNavbar, setShowNavbar] = useState(false);
 
-    const handleShowNavbar = () => {
-      setShowNavbar(!showNavbar)
-    }
-    const handleCloseNavbar = () => {
-        setShowNavbar(false); // Set showNavbar to false to close the menu
-    };
+  const handleShowNavbar = () => {
+    setShowNavbar(!showNavbar);
+  };
+
+  const handleCloseNavbar = () => {
+    setShowNavbar(false); // Set showNavbar to false to close the menu
+  };
+
+  // Define the JSON data as a JavaScript array
+  const navbarItems = [
+    { name: 'Home', path: '/' },
+    { name: 'About', path: '/about' },
+    { name: 'Projects', path: '/projects' },
+    { name: 'Contact', path: '/contact' },
+    { name: 'Login', path: '/login' }
+  ];
 
   return (
     <nav className="navbar">
-    <div className="container">
-      <div className="logo">
-      <AiFillMacCommand size={40}  />
-      </div>
-      <div className="menu-icon" onClick={handleShowNavbar}>
-      {!showNavbar ? <FiMenu size={30} /> : <FiX size={30} />}
-      </div>
-      <div className={`nav-elements  ${showNavbar && 'active'}`}>
-      <ul>
-            <li>
-              <NavLink to="/" onClick={handleCloseNavbar}>Home</NavLink>
-            </li>
-            <li>
-                <NavLink to="/about" onClick={handleCloseNavbar}>About</NavLink>
-              
-            </li>
-            <li>
-              <NavLink to="/projects" onClick={handleCloseNavbar}>Projects</NavLink>
-            </li>
-           
-            <li>
-              <NavLink to="/contact" onClick={handleCloseNavbar}>Contact</NavLink>
-            </li>
-            <li>
-              <NavLink to="/Login" onClick={handleCloseNavbar}>Login</NavLink>
-            </li>
+      <div className="container">
+        <div className="logo">
+          <AiFillMacCommand size={40} />
+        </div>
+        <div className="menu-icon" onClick={handleShowNavbar}>
+          {!showNavbar ? <FiMenu size={30} /> : <FiX size={30} />}
+        </div>
+        <div className={`nav-elements ${showNavbar && 'active'}`}>
+          <ul>
+            {navbarItems.map((item, index) => (
+              <li key={index}>
+                <NavLink to={item.path} onClick={handleCloseNavbar}>
+                  {item.name}
+                </NavLink>
+              </li>
+            ))}
           </ul>
+        </div>
       </div>
-    </div>
-  </nav>
-  )
-}
+    </nav>
+  );
+};
 
-export default Navbar
+export default Navbar;

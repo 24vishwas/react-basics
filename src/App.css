@@ -25,3 +25,6 @@
 .sidebar.open + .main-content {
   margin-left: 250px;
 }
+*{
+  box-sizing: border-box;
+}
