@@ -4,9 +4,8 @@ import { NavLink } from 'react-router-dom';
 import DataTable from '../../components/DataTable/DataTable';
 import Sidebar from '../../components/sidebar/Sidebar';
 
-import { FaFilter, FaHome  } from "react-icons/fa";
-import './Dashboard.css'
-
+import { FaFilter, FaHome } from "react-icons/fa";
+import './Dashboard.css';
 
 const Dashboard = () => {
   const data = [
@@ -25,6 +24,7 @@ const Dashboard = () => {
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [filteredData, setFilteredData] = useState(data);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const applyFilters = (filters) => {
     const { companyName, zipCode, minPrice, maxPrice } = filters;
@@ -41,30 +41,50 @@ const Dashboard = () => {
     setFilteredData(filtered);
   };
 
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    const filtered = data.filter(row => 
+      row.brandName.toLowerCase().includes(value) ||
+      row.productType.toLowerCase().includes(value) ||
+      row.planName.toLowerCase().includes(value)
+    );
+
+    setFilteredData(filtered);
+  };
+
   return (
     <div className="dashboard">
-    
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onApplyFilters={applyFilters}
-        />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onApplyFilters={applyFilters}
+      />
       <div className="content">
         <div className='dashboard-header'>
-            <div className='dashboard-nav-items'>
+          <div className='dashboard-nav-items'>
             <NavLink to='/'>
-            <FaHome /> home / DashBoard
+              <FaHome /> home / DashBoard
             </NavLink>
-            </div>
-            <h2>Company or Customer Dashboard</h2>
+          </div>
+          <h2>Company or Customer Dashboard</h2>
         </div>
-       <div className='table-container'>
-        <div>
-        <button className='filter-button' onClick={() => setSidebarOpen(true)}><FaFilter size={15}/></button>
-        <input className='search-field' type="text" placeholder='Search...' />
+        <div className='table-container'>
+          <div>
+            <button className='filter-button' onClick={() => setSidebarOpen(true)}>
+              <FaFilter size={15} />
+            </button>
+            <input 
+              className='search-field' 
+              type="text" 
+              placeholder='Search...' 
+              value={searchTerm} 
+              onChange={handleSearch} 
+            />
+          </div>
+          <DataTable data={filteredData} />
         </div>
-        <DataTable data={filteredData} />
-       </div>
       </div>
     </div>
   );

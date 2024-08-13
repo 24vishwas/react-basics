@@ -58,16 +58,16 @@ const DataTable = ({ data }) => {
       ]);
     }
   );
-  // const display =(data)=> {
-  //   console.log(data);
-  // }
+  const display =(data)=> {
+    console.log(data);
+  }
 
   return (
     <table {...getTableProps()} className="data-table">
       <thead>
         {headerGroups.map(headerGroup => {
           const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
-          // display(headerGroup.getHeaderGroupProps)
+          display(headerGroup)
           return (
             <tr key={key} {...restHeaderGroupProps}>
               {headerGroup.headers.map(column => {

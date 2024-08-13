@@ -1,8 +1,8 @@
 /* Sidebar Styles */
 .sidebar {
-  /* position: absolute; */
-  top: 0;
-  left: -300px;
+  /* position: relative; */
+  /* top: 0; */
+  /* left: -300px; */
   width: 0;
   height: 100vh;
   background-color: #f4f4f4;
@@ -11,16 +11,30 @@
   transition: right 0.3s ease-in-out;
   z-index: 1000;
   overflow-y: auto;
-  
   transition: .3s ease;
+  border: 1px solid gray;
 }
 
 .sidebar.open {
   /* left: 0; */
   width: 300px;
+  /* padding: 20px; */
+}
+.sidebar-header{
+  background-color: rgb(74, 157, 129);
+  height: 70px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sidebar-header h2{
+  margin: 0;
+  color: white;
+}
+.sidebar form{
   padding: 20px;
 }
-
 .sidebar .form-group {
   margin-bottom: 15px;
 }
