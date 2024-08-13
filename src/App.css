@@ -18,13 +18,13 @@
   transition: margin-left 0.3s ease;
 }
 
-.sidebar + .main-content {
+/* .sidebar + .main-content {
   margin-left: 40px;
 }
 
 .sidebar.open + .main-content {
   margin-left: 250px;
-}
+} */
 *{
   box-sizing: border-box;
 }

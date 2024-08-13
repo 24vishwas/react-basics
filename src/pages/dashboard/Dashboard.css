@@ -1,0 +1,56 @@
+.dashboard{
+    position: relative;
+    display: flex;
+}
+.dashboard .content{
+    flex: 1; 
+    /* padding: 20px; */
+}
+.dashboard-header{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+    height: 70px;
+    padding-inline: 30px;
+    border: 1px solid grey;
+}
+.dashboard-header h2{
+    margin-inline: auto;
+    margin-block: 0;
+    color: grey;
+}
+.dashboard-nav-items{
+    flex-shrink: 0;
+}
+.dashboard-nav-items > *{
+    text-decoration: none;
+    color: grey;
+    font-size: 12px;
+}
+.table-container{
+    background-color: whitesmoke;
+    border: 1px solid rgb(218, 217, 217);
+    border-radius: 5px;
+    margin-inline: 20px;
+    margin-block: 30px;
+    
+}
+.filter-button{
+    border: 1px solid gray;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: white;
+    aspect-ratio: 1/1;
+    width: 40px;
+    color: gray;
+    margin-inline: 20px;
+    margin-top: 20px;
+}
+.search-field{
+    height: 40px;
+    border-radius: 10px;
+    outline: none;
+    border: 1px solid gray;
+    padding: 10px;
+}

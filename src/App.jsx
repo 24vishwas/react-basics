@@ -10,6 +10,8 @@ import Contact from './pages/contact/Contact';
 import Sidebar from './components/sidebar/Sidebar';
 import Login from './pages/Login/Login';
 import Register from './pages/Login/Register';
+import CompanyRegister from './pages/Login/Companyregister';
+import Dashboard from './pages/dashboard/Dashboard';
 
 
 function App() {
@@ -25,10 +27,11 @@ function App() {
         <main>
 
           <Routes>
-            <Route path="/" exact element={<Home/>} />
+            <Route path="/" exact element={<Dashboard/>} />
             <Route path="/about" element={<About/>} />
             <Route path="/projects" element={<Projects/>} />
             <Route path="/contact" element={<Contact/>} />
+            <Route path="/company-register" element={<CompanyRegister/>} />
             <Route path="/Login" element={<Login/>} />
             <Route path="/Register" element={<Register/>} />
           </Routes>

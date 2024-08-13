@@ -1,33 +1,65 @@
-import React from 'react'
-import { useState } from 'react'
-import { FaBars, FaTimes } from 'react-icons/fa';
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
 
 import './Sidebar.css'
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose, onApplyFilters }) => {
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      companyName: '',
+      zipCode: '',
+      minPrice: '',
+      maxPrice: '',
+    }
+  });
 
-    const [isOpen, setIsOpen] = useState(false);
+  const onSubmit = data => {
+    onApplyFilters(data);
+  };
 
-    const toggleSidebar = () => {
-      setIsOpen(!isOpen);
-    };
   return (
-    
-         <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <button onClick={toggleSidebar} className="toggle-button">
-      {isOpen ? <FaTimes /> : <FaBars />}
-      </button>
-      <div className="content">
-        <h2>Sidebar Content</h2>
-        <ul>
-          <li>Home</li>
-          <li>About</li>
-          <li>Contact</li>
-        </ul>
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <div className='sidebar-header'>
+        <h2>Search Criteria</h2>
       </div>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="form-group">
+        <label>Company Name</label>
+        <Controller
+          name="companyName"
+          control={control}
+          render={({ field }) => <input type="text" {...field} />}
+        />
+      </div>
+      <div className="form-group">
+        <label>Zip Code</label>
+        <Controller
+          name="zipCode"
+          control={control}
+          render={({ field }) => <input type="text" {...field} />}
+        />
+      </div>
+      <div className="form-group">
+        <label>Min Price</label>
+        <Controller
+          name="minPrice"
+          control={control}
+          render={({ field }) => <input type="number" {...field} />}
+        />
+      </div>
+      <div className="form-group">
+        <label>Max Price</label>
+        <Controller
+          name="maxPrice"
+          control={control}
+          render={({ field }) => <input type="number" {...field} />}
+        />
+      </div>
+      <button type="submit" className="apply-filters">Apply Filters</button>
+    </form>
+    <button onClick={onClose} className="close-btn">Close</button>
+  </div>
+  );
+};
 
-  )
-}
-
-export default Sidebar
+export default Sidebar;

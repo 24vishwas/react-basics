@@ -9,60 +9,55 @@ import './Register.css';
 const formConfig = {
     fields: [
         {
-            section: "Personal Details",
+            section: "Company Details",
             fields: [
-                { name: "firstName", type: "text", placeholder: "First Name", validation: { required: true }, icon: "FaUser" },
-                { name: "lastName", type: "text", placeholder: "Last Name", validation: { required: true }, icon: "FaUser" },
-                { name: "dob", type: "date", placeholder: "Date of Birth", validation: { required: true } },
-                { name: "address", type: "text", placeholder: "Address", validation: { required: true } },
-                { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
+                { name: "companyName", type: "text", placeholder: "Enter Company Name", label:'Company', validation: { required: true }, icon: "FaUser" },
+                { name: "address1", type: "text", placeholder: "Enter Address 1", label:'Address 1', validation: { required: true } },
+                { name: "address2", type: "text", placeholder: "Enter Address 2", label:'Address 2', validation: { required: true } },
             ],
         },
         {
-            section: "Account Details",
+            section: "Contact Person",
             fields: [
-                { name: "email", type: "email", placeholder: "Email", validation: { required: true }, icon: "FaEnvelope" },
-                { name: "password", type: "password", placeholder: "Password", validation: { required: true }, icon: "FaLock" },
-                { name: "confirmPassword", type: "password", placeholder: "Confirm Password", validation: { required: true }, icon: "FaLock" },
-                { name: "securityQuestion1", type: "select", placeholder: "Security Question 1",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "answer1", type: "text", placeholder: "Answer for Question 1", validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "securityQuestion2", type:  "select", placeholder: "Security Question 2",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "answer2", type: "text", placeholder: "Answer for Question 2", validation: { required: true }, icon: "FaQuestionCircle" },
+                { name: "firstName", type: "text", placeholder: "Enter First Name", label:'First Name', validation: { required: true }, icon: "FaUser" },
+                { name: "middleName", type: "text", placeholder: "Enter Middle Name", label:'Middle Name', validation: { required: false }, icon: "FaUser" },
+                { name: "lastName", type: "text", placeholder: "Enter Last Name", label:'Last Name', validation: { required: true }, icon: "FaUser" },
+                { name: "email", type: "email", placeholder: "Enter Email", label:'Email', validation: { required: true }, icon: "FaEnvelope" },
+                { name: "phone", type: "tel", placeholder: "Enter Phone", label:'Phone', validation: { required: true }, icon: "FaPhone" },
+                { name: "fax", type: "tel", placeholder: "Enter Fax", label:'Fax', validation: { required: false }, icon: "FaPhone" },
             ],
         },
-        {
-            section: "Property Details",
-            fields: [
-                { name: "swimmingPool", type: "select", placeholder: "Swimming Pool", options: ["yes", "No"] },
-                { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
-                { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
-                { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
-            ],
-        },
+        // {
+        //     section: "Property Details",
+        //     fields: [
+        //         { name: "swimmingPool", type: "select", placeholder: "Swimming Pool", options: ["yes", "No"] },
+        //         { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
+        //         { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
+        //         { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
+        //     ],
+        // },
     ],
 };
 
-const Register = () => {
+const CompanyRegister = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [submit, setSubmit] = useState(false);
 
     const onSubmit = (data) => {
-        localStorage.setItem(data.firstName, JSON.stringify({
+        localStorage.setItem(data.companyName, JSON.stringify({
+            companyName: data.companyName,
             firstName: data.firstName,
+            middleName: data.middleName,
             lastName: data.lastName,
-            dob: data.dob,
-            address: data.address,
+            
+            address1: data.address1,
+            address2: data.address2,
             phone: data.phone,
             email: data.email,
-            password: data.password,
-            securityQuestion1: data.securityQuestion1,
-            securityQuestion2: data.securityQuestion2,
-            swimmingPool: data.swimmingPool,
-            houseType: data.houseType,
-            numRooms: data.numRooms,
-            numEVs: data.numEVs,
+            fax: data.fax,
+            
         }));
-        console.log(JSON.parse(localStorage.getItem(data.firstName)));
+        console.log(JSON.parse(localStorage.getItem(data.companyName)));
         setSubmit(true);
     };
 
@@ -78,8 +73,8 @@ const Register = () => {
     return (
         <div className='register-page'>
             <div className='register-content'>
-                <h1>Customer Registration</h1>
-                <p>Please fill all the your details and click on register - sample help text</p>
+                <h1>Welcome to NPS</h1>
+                <p>Please fill all the Company details and click on register - sample help text</p>
                 {submit && <p>Registered</p>}
                 <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
                     {formConfig.fields.map((section, sectionIndex) => (
@@ -90,24 +85,25 @@ const Register = () => {
                             
                             {section.fields.map((field, index) => (
                                 <div key={index} className="fields-container">
-                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                    <label htmlFor={field.name}>{field.label}</label>
                                     <div className="input-fields">
                                     {field.icon && iconComponents[field.icon]}
                                     {field.type === "select" ? (
-                                        <select {...register(field.name, field.validation)}>
+                                        <select {...register(field.name, field.validation)} id={field.name}>
                                             {field.options.map((option, optIndex) => (
                                                 <option key={optIndex} value={option}>{option}</option>
                                             ))}
                                         </select>
                                     ) : field.type === "checkbox" ? (
                                         <label>
-                                            <input type="checkbox" {...register(field.name)} />
+                                            <input type="checkbox" {...register(field.name)} id={field.name}/>
                                             {field.placeholder}
                                         </label>
                                     ) : (
                                         <input
                                             type={field.type}
                                             placeholder={field.placeholder}
+                                            id={field.name}
                                             {...register(field.name, field.validation)}
                                         />
                                     )}
@@ -133,4 +129,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default CompanyRegister;
