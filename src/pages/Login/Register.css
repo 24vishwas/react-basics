@@ -175,3 +175,7 @@
         min-width: none;
     }
 }
+
+.form-section.hidden{
+    display: none;
+}
