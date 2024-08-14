@@ -7,7 +7,7 @@ import { FaUser, FaLock, FaSignInAlt, FaEnvelope, FaPhone, FaQuestionCircle, FaH
 import './Register.css';
 
 const formConfig = {
-    fields: [
+    sections: [
         {
             section: "Personal Details",
             fields: [
@@ -43,8 +43,9 @@ const formConfig = {
 };
 
 const Register = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors, isValid }, trigger } = useForm({ mode: 'onChange' });
     const [submit, setSubmit] = useState(false);
+    const [currentSection, setCurrentSection] = useState(0);
 
     const onSubmit = (data) => {
         localStorage.setItem(data.firstName, JSON.stringify({
@@ -66,6 +67,17 @@ const Register = () => {
         setSubmit(true);
     };
 
+    const handleNext = async () => {
+        const valid = await trigger(); // Triggers validation for the current section
+        if (valid) {
+            setCurrentSection(currentSection + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        setCurrentSection(currentSection - 1);
+    };
+
     const iconComponents = {
         FaUser: <FaUser />,
         FaLock: <FaLock />,
@@ -77,59 +89,70 @@ const Register = () => {
 
     return (
         <div className='register-page'>
-            <div className='register-content'>
-                <h1>Customer Registration</h1>
-                <p>Please fill all the your details and click on register - sample help text</p>
-                {submit && <p>Registered</p>}
-                <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
-                    {formConfig.fields.map((section, sectionIndex) => (
+        <div className='register-content'>
+            <h1>Customer Registration</h1>
+            <p>Please fill in your details and click on register - sample help text</p>
+            {submit && <p>Registered</p>}
+            <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
+                {formConfig.sections.map((section, sectionIndex) => (
+                    sectionIndex === currentSection && (
                         <div key={sectionIndex} className="form-section">
                             <h3>{section.section}</h3>
                             <div className='form-section-wrapper'>
-
-                            
-                            {section.fields.map((field, index) => (
-                                <div key={index} className="fields-container">
-                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
-                                    <div className="input-fields">
-                                    {field.icon && iconComponents[field.icon]}
-                                    {field.type === "select" ? (
-                                        <select {...register(field.name, field.validation)}>
-                                            {field.options.map((option, optIndex) => (
-                                                <option key={optIndex} value={option}>{option}</option>
-                                            ))}
-                                        </select>
-                                    ) : field.type === "checkbox" ? (
-                                        <label>
-                                            <input type="checkbox" {...register(field.name)} />
-                                            {field.placeholder}
-                                        </label>
-                                    ) : (
-                                        <input
-                                            type={field.type}
-                                            placeholder={field.placeholder}
-                                            {...register(field.name, field.validation)}
-                                        />
-                                    )}
-                                    {errors[field.name] && <span className='error-note'>
-                                        *{field.placeholder}* is mandatory
-                                    </span>}
+                                {section.fields.map((field, index) => (
+                                    <div key={index} className="fields-container">
+                                        <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                        <div className="input-fields">
+                                            {field.icon && iconComponents[field.icon]}
+                                            {field.type === "select" ? (
+                                                <select {...register(field.name, field.validation)}>
+                                                    {field.options.map((option, optIndex) => (
+                                                        <option key={optIndex} value={option}>{option}</option>
+                                                    ))}
+                                                </select>
+                                            ) : field.type === "checkbox" ? (
+                                                <label>
+                                                    <input type="checkbox" {...register(field.name)} />
+                                                    {field.placeholder}
+                                                </label>
+                                            ) : (
+                                                <input
+                                                    type={field.type}
+                                                    placeholder={field.placeholder}
+                                                    {...register(field.name, field.validation)}
+                                                />
+                                            )}
+                                            {errors[field.name] && <span className='error-note'>
+                                                *{field.placeholder}* is mandatory
+                                            </span>}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                             </div>
                         </div>
-                    ))}
-                    <div className='button-container'>
-                    <button type="reset" className="submit-button reset-button"> Clear</button>
-                    <button type="submit" className="submit-button"> <FaSignInAlt /> Register</button>
-                    </div>
-                </form>
-                <p>Already have an account?</p>
-                <p><NavLink className='register-link' to="/Login">Login here</NavLink></p>
-            </div>
-           
+                    )
+                ))}
+                <div className='button-container'>
+                    {currentSection > 0 && (
+                        <button type="button" className="submit-button prev-button" onClick={handlePrevious}>
+                            Previous
+                        </button>
+                    )}
+                    {currentSection < formConfig.sections.length - 1 ? (
+                        <button type="button" className="submit-button next-button" onClick={handleNext} disabled={!isValid}>
+                            Next
+                        </button>
+                    ) : (
+                        <button type="submit" className="submit-button">
+                            <FaSignInAlt /> Register
+                        </button>
+                    )}
+                </div>
+            </form>
+            <p>Already have an account?</p>
+            <p><NavLink className='register-link' to="/Login">Login here</NavLink></p>
         </div>
+    </div>
     );
 };
 
