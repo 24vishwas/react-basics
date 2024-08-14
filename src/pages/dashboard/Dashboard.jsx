@@ -21,21 +21,26 @@ const Dashboard = () => {
     { index: 10, brandName: 'Brand Q', productType: 'Type 3', planName: 'Plan B', charge: 500, tax: 20, total: 520 },
     // Add more rows as needed
   ];
+  const topCompanies = [...new Set(data.map(item => item.brandName))].slice(0, 4);
+  const productTypes = [...new Set(data.map(item => item.productType))];
+  
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [filteredData, setFilteredData] = useState(data);
   const [searchTerm, setSearchTerm] = useState('');
 
   const applyFilters = (filters) => {
-    const { companyName, zipCode, minPrice, maxPrice } = filters;
-    const brandName = companyName;
+    const { companyName, zipCode, minPrice, maxPrice, productTypes=[] } = filters;
     const filtered = data.filter(row => {
       const withinPriceRange = (minPrice === '' || row.charge >= minPrice) &&
                                (maxPrice === '' || row.charge <= maxPrice);
+      const productTypeMatch = productTypes.length === 0 || productTypes.includes(row.productType);
+
       return (
         (!companyName || row.brandName.includes(companyName)) &&
         (!zipCode || row.zipCode.includes(zipCode)) &&
-        withinPriceRange
+        withinPriceRange &&
+        productTypeMatch
       );
     });
     setFilteredData(filtered);
@@ -60,6 +65,8 @@ const Dashboard = () => {
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onApplyFilters={applyFilters}
+        companyOptions={topCompanies}
+        productTypes={productTypes}
       />
       <div className="content">
         <div className='dashboard-header'>
