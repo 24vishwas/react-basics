@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { NavLink } from 'react-router-dom';
 import bgimg from '../../assets/login-bg.jpg';
-import { FaUser, FaLock, FaSignInAlt, FaEnvelope, FaPhone, FaQuestionCircle, FaHome } from 'react-icons/fa';
+import { FaUser, FaLock, FaSignInAlt, FaEnvelope, FaPhone, FaQuestionCircle, FaHome, FaAddressCard ,FaCalendarDay  } from 'react-icons/fa';
 
 import './Register.css';
 
@@ -12,24 +12,44 @@ const formConfig = {
             section: "Personal Details",
             fields: [
                 { name: "firstName", type: "text", placeholder: "First Name", validation: { required: true }, icon: "FaUser" },
+                { name: "middleName", type: "text", placeholder: "Middle Name", validation: { required: false }, icon: "FaUser" },
                 { name: "lastName", type: "text", placeholder: "Last Name", validation: { required: true }, icon: "FaUser" },
-                { name: "dob", type: "date", placeholder: "Date of Birth", validation: { required: true } },
-                { name: "address", type: "text", placeholder: "Address", validation: { required: true } },
+                { name: "email", type: "email", placeholder: "Email", validation: { required: true }, icon: "FaEnvelope" },
+                { name: "password", type: "password", placeholder: "Password", validation: { required: true }, icon: "FaLock" },
+                { name: "confirmPassword", type: "password", placeholder: "Confirm Password", validation: { required: true }, icon: "FaLock" },
+                { name: "ssn", type: "text", placeholder: "SSN", validation: { required: true }, icon: "FaLock" },
+                { name: "profileImage", type: "file", placeholder: "Upload Profile Image", validation: { required: true }, icon: "FaUser" },
+                { name: "dob", type: "date", placeholder: "Date of Birth", validation: { required: true }, icon:'FaCalendarDay'},
                 { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
             ],
         },
         {
-            section: "Account Details",
+            section: "Customer Address",
             fields: [
-                { name: "email", type: "email", placeholder: "Email", validation: { required: true }, icon: "FaEnvelope" },
-                { name: "password", type: "password", placeholder: "Password", validation: { required: true }, icon: "FaLock" },
-                { name: "confirmPassword", type: "password", placeholder: "Confirm Password", validation: { required: true }, icon: "FaLock" },
-                { name: "securityQuestion1", type: "select", placeholder: "Security Question 1",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "answer1", type: "text", placeholder: "Answer for Question 1", validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "securityQuestion2", type:  "select", placeholder: "Security Question 2",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "answer2", type: "text", placeholder: "Answer for Question 2", validation: { required: true }, icon: "FaQuestionCircle" },
+                { name: "meterId", type: "text", placeholder: "Meter Id", validation: { required: true }, icon: "FaLock" },
+                { name: "isResBus", type: "select", placeholder: "Is Res Bus",options: ["R-Res", "B-small Business", "C-Commerce"], validation: { required: true }, icon: "FaQuestionCircle" },
+                { name: "tdsp", type: "text", placeholder: "TDSP", validation: { required: true }, icon: "FaLock" },
+                { name: "address1", type: "text", placeholder: "Address 1", validation: { required: true }, icon: "FaAddressCard" },
+                { name: "address2", type: "text", placeholder: "Address 2", validation: { required: false }, icon: "FaAddressCard" },
+                { name: "city", type: "text", placeholder: "City", validation: { required: true }, icon: "FaAddressCard" },
+                { name: "state", type: "text", placeholder: "State", validation: { required: true }, icon: "FaAddressCard" },
+                { name: "country", type: "text", placeholder: "Country", validation: { required: true }, icon: "FaAddressCard" },
+                
             ],
         },
+        // {
+        //     section: "Account Details",
+        //     fields: [
+                
+                
+                
+                
+        //         { name: "securityQuestion1", type: "select", placeholder: "Security Question 1",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
+        //         { name: "answer1", type: "text", placeholder: "Answer for Question 1", validation: { required: true }, icon: "FaQuestionCircle" },
+        //         { name: "securityQuestion2", type:  "select", placeholder: "Security Question 2",options: ["Apartment", "Villa", "Townhouse"], validation: { required: true }, icon: "FaQuestionCircle" },
+        //         { name: "answer2", type: "text", placeholder: "Answer for Question 2", validation: { required: true }, icon: "FaQuestionCircle" },
+        //     ],
+        // },
         {
             section: "Property Details",
             fields: [
@@ -49,31 +69,19 @@ const Register = () => {
     const [currentStep, setCurrentStep] = useState(0);
 
     const onSubmit = (data) => {
-        localStorage.setItem(data.firstName, JSON.stringify({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            dob: data.dob,
-            address: data.address,
-            phone: data.phone,
-            email: data.email,
-            password: data.password,
-            securityQuestion1: data.securityQuestion1,
-            securityQuestion2: data.securityQuestion2,
-            swimmingPool: data.swimmingPool,
-            houseType: data.houseType,
-            numRooms: data.numRooms,
-            numEVs: data.numEVs,
-        }));
+        
+        const formData = {};
+
+        for (let key in data) {
+            formData[key] = data[key];
+        }
+    
+        localStorage.setItem(data.firstName, JSON.stringify(formData));
         console.log(JSON.parse(localStorage.getItem(data.firstName)));
         setSubmit(true);
     };
 
-    // const handleNext = async () => {
-    //     const valid = await trigger(); // Triggers validation for the current section
-    //     if (valid) {
-    //         setCurrentSection(currentSection + 1);
-    //     }
-    // };
+
     const handleNext = async () => {
         const currentFields = formConfig.fields[currentStep].fields.map(field => field.name);
         const valid = await trigger(currentFields);
@@ -83,9 +91,7 @@ const Register = () => {
         }
     };
 
-    // const handlePrevious = () => {
-    //     setCurrentSection(currentSection - 1);
-    // };
+
     const handlePrevious = () => {
         setCurrentStep(prevStep => prevStep - 1);
     };
@@ -97,6 +103,8 @@ const Register = () => {
         FaPhone: <FaPhone />,
         FaQuestionCircle: <FaQuestionCircle />,
         FaHome: <FaHome />,
+        FaAddressCard : <FaAddressCard />,
+        FaCalendarDay  : <FaCalendarDay  />,
     };
 
     return (
