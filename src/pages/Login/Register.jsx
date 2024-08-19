@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from "react-hook-form";
 import { NavLink } from 'react-router-dom';
-import { FaUser, FaLock, FaEnvelope, FaPhone, FaQuestionCircle, FaAddressCard, FaCalendarDay } from 'react-icons/fa';
-
 import { createUser } from '../../api/user';
-
+import { FaUser, FaLock, FaEnvelope, FaPhone, FaQuestionCircle, FaAddressCard, FaCalendarDay } from 'react-icons/fa';
+import { CgClose } from "react-icons/cg";
 import './Register.css';
 
 const formConfig = {
@@ -45,25 +44,19 @@ const formConfig = {
 };
 
 const Register = () => {
-    const { register, handleSubmit, control, formState: { errors, isValid }, trigger, getValues } = useForm({ mode: 'onChange' });
+    const { register, handleSubmit, control, formState: { errors, isValid }, trigger, getValues, setValue } = useForm({ mode: 'onChange' });
     const [currentStep, setCurrentStep] = useState(0);
-    const [personalData, setPersonalData] = useState({});
+    const [formData, setFormData] = useState(null);  // Holds the form data
     const { fields: addressFields, append, remove } = useFieldArray({
         control,
         name: "customerAddresses",
     });
 
     const onSubmit = async (data) => {
-        setPersonalData(data.personalDetails);
+        setFormData(data);  // Save data for final review
+        // Optionally, store data temporarily
         localStorage.setItem("formData", JSON.stringify(data));
-        console.log(data);
-
-        try {
-            const response = await createUser(data);
-            console.log('User created successfully:', response);
-        } catch (error) {
-            console.error('Error creating user:', error);
-        }
+        console.log(JSON.parse(localStorage.getItem("formData")));
     };
 
     const handleNext = async () => {
@@ -76,12 +69,25 @@ const Register = () => {
                 // Ensure at least one address is present
                 append({});
             }
-            setCurrentStep(prevStep => prevStep + 1);
+            if (currentStep === formConfig.sections.length - 1) {
+                // Final Review step
+                setCurrentStep(prevStep => prevStep + 1);
+            } else {
+                setCurrentStep(prevStep => prevStep + 1);
+            }
         }
     };
 
     const handlePrevious = () => {
-        setCurrentStep(prevStep => prevStep - 1);
+        if (currentStep === formConfig.sections.length) {
+            setCurrentStep(prevStep => prevStep - 1);
+        } else {
+            setCurrentStep(prevStep => prevStep - 1);
+        }
+    };
+
+    const handleEdit = () => {
+        setCurrentStep(0);  // Go back to the first step for editing
     };
 
     const addMoreAddress = () => {
@@ -89,7 +95,11 @@ const Register = () => {
     };
 
     const deleteAddress = (index) => {
-        remove(index);
+        if(confirm('Please confirm the delete')){
+
+            remove(index);
+        }
+        
     };
 
     const iconComponents = {
@@ -108,76 +118,120 @@ const Register = () => {
                 <h1>Customer Registration</h1>
                 <p>Please fill all your details and click on register - sample help text</p>
                 <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
-                    {formConfig.sections.map((section, sectionIndex) => (
-                        <div key={sectionIndex} className={`form-section ${currentStep === sectionIndex ? '' : 'hidden'}`}>
-                            <h3>{section.title}</h3>
-                            <div className='form-section-wrapper'>
-                                {sectionIndex === 1 ? (
-                                    // Handle Customer Address with Add/Delete functionality
-                                    addressFields.map((item, index) => (
-                                        <div key={item.id} className="address-section">
-                                            {section.fields.map((field, fieldIndex) => (
-                                                <div key={fieldIndex} className="fields-container">
-                                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
-                                                    <div className="input-fields">
-                                                        {field.icon && iconComponents[field.icon]}
-                                                        {field.type === "select" ? (
-                                                            <select {...register(`customerAddresses.${index}.${field.name}`, field.validation)}>
-                                                                {field.options.map((option, optIndex) => (
-                                                                    <option key={optIndex} value={option}>{option}</option>
-                                                                ))}
-                                                            </select>
-                                                        ) : (
-                                                            <input
-                                                                type={field.type}
-                                                                placeholder={field.placeholder}
-                                                                {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
-                                                            />
-                                                        )}
-                                                        {errors?.customerAddresses?.[index]?.[field.name] && (
-                                                            <span className='error-note'>*{field.placeholder}* is mandatory</span>
-                                                        )}
+                    {currentStep < formConfig.sections.length ? (
+                        formConfig.sections.map((section, sectionIndex) => (
+                            <div key={sectionIndex} className={`form-section ${currentStep === sectionIndex ? '' : 'hidden'}`}>
+                                <h3>{section.title}</h3>
+                                <div className='form-section-wrapper'>
+                                    {sectionIndex === 1 ? (
+                                        // Handle Customer Address with Add/Delete functionality
+                                        
+                                            
+                                        
+                                        addressFields.map((item, index) => (
+                                            <div className='customer-section-wrapper'>
+                                            <div key={item.id} className="address-section">
+                                                {section.fields.map((field, fieldIndex) => (
+                                                    <div key={fieldIndex} className="fields-container">
+                                                        <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                                        <div className="input-fields">
+                                                            {field.icon && iconComponents[field.icon]}
+                                                            {field.type === "select" ? (
+                                                                <select {...register(`customerAddresses.${index}.${field.name}`, field.validation)}>
+                                                                    {field.options.map((option, optIndex) => (
+                                                                        <option key={optIndex} value={option}>{option}</option>
+                                                                    ))}
+                                                                </select>
+                                                            ) : (
+                                                                <input
+                                                                    type={field.type}
+                                                                    placeholder={field.placeholder}
+                                                                    {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
+                                                                />
+                                                            )}
+                                                            {errors?.customerAddresses?.[index]?.[field.name] && (
+                                                                <span className='error-note'>*{field.placeholder}* is mandatory</span>
+                                                            )}
+                                                        </div>
                                                     </div>
+                                                ))}
+                                                   
+                                            </div>
+                                             <button type="button" className="delete-button" onClick={() => deleteAddress(index)}><CgClose /></button>
+                                             </div>
+                                        ))
+                                        
+                                        
+                                    ) : (
+                                        section.fields.map((field, index) => (
+                                            <div key={index} className="fields-container">
+                                                <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                                <div className="input-fields">
+                                                    {field.icon && iconComponents[field.icon]}
+                                                    {field.type === "select" ? (
+                                                        <select {...register(field.name, field.validation)}>
+                                                            {field.options.map((option, optIndex) => (
+                                                                <option key={optIndex} value={option}>{option}</option>
+                                                            ))}
+                                                        </select>
+                                                    ) : (
+                                                        <input
+                                                            type={field.type}
+                                                            placeholder={field.placeholder}
+                                                            {...register(field.name, field.validation)}
+                                                        />
+                                                    )}
+                                                    {errors[field.name] && (
+                                                        <span className='error-note'>*{field.placeholder}* is mandatory</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                {sectionIndex === 1 && (
+                                    <button type="button" className="next-button" onClick={addMoreAddress}>Add More</button>
+                                                    )}
+                            </div>
+
+                        ))
+                    ) : (
+                        // Final Review Section
+                        <div className="form-section">
+                            <h3>Review Your Details</h3>
+                            <div className="form-section">
+                                <h3>Review Your Details</h3>
+                                <div className='review-section'>
+                                    <h4>Personal Details</h4>
+                                    <div className='review-content'>
+                                        {formConfig.sections[0].fields.map(field => (
+                                            <div key={field.name}>
+                                                <strong>{field.placeholder}:</strong>
+                                                {field.type === 'file'
+                                                    ? formData?.[field.name]?.[0]?.name || 'No file selected'
+                                                    : formData?.[field.name] || 'N/A'}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <h4>Address and Property Details</h4>
+                                    {formData?.customerAddresses?.map((address, index) => (
+                                        <div key={index} className='review-content'>
+                                            {formConfig.sections[1].fields.map(field => (
+                                                <div key={field.name}>
+                                                    <strong>{field.placeholder}:</strong>
+                                                    {address[field.name] || 'N/A'}
                                                 </div>
                                             ))}
-                                            <div className='button-container'>
-                                                <button type="button" className="delete-button" onClick={() => deleteAddress(index)}>Delete</button>
-                                                {sectionIndex === 1 && (
-                                    <button type="button" className="next-button" onClick={addMoreAddress}>Add More</button>
-                                )}
-                                            </div>
                                         </div>
-                                    ))
-                                ) : (
-                                    section.fields.map((field, index) => (
-                                        <div key={index} className="fields-container">
-                                            <label htmlFor={field.placeholder}>{field.placeholder}</label>
-                                            <div className="input-fields">
-                                                {field.icon && iconComponents[field.icon]}
-                                                {field.type === "select" ? (
-                                                    <select {...register(field.name, field.validation)}>
-                                                        {field.options.map((option, optIndex) => (
-                                                            <option key={optIndex} value={option}>{option}</option>
-                                                        ))}
-                                                    </select>
-                                                ) : (
-                                                    <input
-                                                        type={field.type}
-                                                        placeholder={field.placeholder}
-                                                        {...register(field.name, field.validation)}
-                                                    />
-                                                )}
-                                                {errors[field.name] && (
-                                                    <span className='error-note'>*{field.placeholder}* is mandatory</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                               
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="button-container">
+                                <button type="button" className="submit-button" onClick={handleEdit}>Edit</button>
+                                <button type="submit" className="submit-button">Submit</button>
                             </div>
                         </div>
-                    ))}
+                    )}
 
                     <div className="form-navigation button-container">
                         {currentStep > 0 && (
@@ -185,15 +239,11 @@ const Register = () => {
                                 Previous
                             </button>
                         )}
-                        {currentStep < formConfig.sections.length - 1 ? (
+                        {currentStep < formConfig.sections.length ? (
                             <button type="button" className="submit-button" onClick={handleNext}>
                                 Next
                             </button>
-                        ) : (
-                            <button type="submit" className="submit-button">
-                                Submit
-                            </button>
-                        )}
+                        ) : null}
                     </div>
                 </form>
                 <p>Already have an account?</p>
