@@ -228,3 +228,26 @@
     position: relative;
     margin-top: 20px;
 }
+.review-item{
+    margin-block: 20px;
+}
+.review-item h3{
+    font-size: 1rem;
+    margin: 0;
+}
+.review-item p{
+    text-align: left;
+    margin: 0;
+    font-size: 0.8rem;
+}
+.review-section{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+@media (max-width:600px) {
+    .review-section{
+        justify-content: flex-start;
+    }
+}

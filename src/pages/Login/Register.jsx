@@ -53,8 +53,9 @@ const Register = () => {
     });
 
     const onSubmit = async (data) => {
-        setFormData(data);  // Save data for final review
+        // setFormData(data);  // Save data for final review
         // Optionally, store data temporarily
+        console.log(formData);
         localStorage.setItem("formData", JSON.stringify(data));
         console.log(JSON.parse(localStorage.getItem("formData")));
     };
@@ -71,6 +72,7 @@ const Register = () => {
             }
             if (currentStep === formConfig.sections.length - 1) {
                 // Final Review step
+                setFormData(getValues());
                 setCurrentStep(prevStep => prevStep + 1);
             } else {
                 setCurrentStep(prevStep => prevStep + 1);
@@ -95,11 +97,11 @@ const Register = () => {
     };
 
     const deleteAddress = (index) => {
-        if(confirm('Please confirm the delete')){
+        if (confirm('Please confirm the delete')) {
 
             remove(index);
         }
-        
+
     };
 
     const iconComponents = {
@@ -125,43 +127,43 @@ const Register = () => {
                                 <div className='form-section-wrapper'>
                                     {sectionIndex === 1 ? (
                                         // Handle Customer Address with Add/Delete functionality
-                                        
-                                            
-                                        
+
+
+
                                         addressFields.map((item, index) => (
                                             <div className='customer-section-wrapper'>
-                                            <div key={item.id} className="address-section">
-                                                {section.fields.map((field, fieldIndex) => (
-                                                    <div key={fieldIndex} className="fields-container">
-                                                        <label htmlFor={field.placeholder}>{field.placeholder}</label>
-                                                        <div className="input-fields">
-                                                            {field.icon && iconComponents[field.icon]}
-                                                            {field.type === "select" ? (
-                                                                <select {...register(`customerAddresses.${index}.${field.name}`, field.validation)}>
-                                                                    {field.options.map((option, optIndex) => (
-                                                                        <option key={optIndex} value={option}>{option}</option>
-                                                                    ))}
-                                                                </select>
-                                                            ) : (
-                                                                <input
-                                                                    type={field.type}
-                                                                    placeholder={field.placeholder}
-                                                                    {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
-                                                                />
-                                                            )}
-                                                            {errors?.customerAddresses?.[index]?.[field.name] && (
-                                                                <span className='error-note'>*{field.placeholder}* is mandatory</span>
-                                                            )}
+                                                <div key={item.id} className="address-section">
+                                                    {section.fields.map((field, fieldIndex) => (
+                                                        <div key={fieldIndex} className="fields-container">
+                                                            <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                                            <div className="input-fields">
+                                                                {field.icon && iconComponents[field.icon]}
+                                                                {field.type === "select" ? (
+                                                                    <select {...register(`customerAddresses.${index}.${field.name}`, field.validation)}>
+                                                                        {field.options.map((option, optIndex) => (
+                                                                            <option key={optIndex} value={option}>{option}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                ) : (
+                                                                    <input
+                                                                        type={field.type}
+                                                                        placeholder={field.placeholder}
+                                                                        {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
+                                                                    />
+                                                                )}
+                                                                {errors?.customerAddresses?.[index]?.[field.name] && (
+                                                                    <span className='error-note'>*{field.placeholder}* is mandatory</span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                                   
+                                                    ))}
+
+                                                </div>
+                                                <button type="button" className="delete-button" onClick={() => deleteAddress(index)}><CgClose /></button>
                                             </div>
-                                             <button type="button" className="delete-button" onClick={() => deleteAddress(index)}><CgClose /></button>
-                                             </div>
                                         ))
-                                        
-                                        
+
+
                                     ) : (
                                         section.fields.map((field, index) => (
                                             <div key={index} className="fields-container">
@@ -191,35 +193,51 @@ const Register = () => {
                                 </div>
                                 {sectionIndex === 1 && (
                                     <button type="button" className="next-button" onClick={addMoreAddress}>Add More</button>
-                                                    )}
+                                )}
                             </div>
 
                         ))
                     ) : (
                         // Final Review Section
+
                         <div className="form-section">
-                            <h3>Review Your Details</h3>
-                            <div className="form-section">
-                                <h3>Review Your Details</h3>
-                                <div className='review-section'>
-                                    <h4>Personal Details</h4>
+                            <h2>Review Your Details</h2>
+                            <div className='review-section'>
+                                <div>
+                                    <h3>Personal Details</h3>
                                     <div className='review-content'>
-                                        {formConfig.sections[0].fields.map(field => (
-                                            <div key={field.name}>
-                                                <strong>{field.placeholder}:</strong>
-                                                {field.type === 'file'
-                                                    ? formData?.[field.name]?.[0]?.name || 'No file selected'
-                                                    : formData?.[field.name] || 'N/A'}
+                                        {formConfig.sections[0].fields.map((field, index) => (
+                                            <div className='review-item' key={field.name || index}> {/* Ensure unique key */}
+                                                <h3>{field.placeholder} : </h3>
+
+                                                {field.type === 'file' ? (
+                                                    formData?.[field.name]?.[0] ? (
+                                                        <>
+                                                            <img
+                                                                src={URL.createObjectURL(formData[field.name][0])}
+                                                                alt="Profile Preview"
+                                                                style={{ width: '200px', height: 'auto', objectFit: 'cover' }}
+                                                            />
+                                                            <div>{formData[field.name][0].name}</div>
+                                                        </>
+                                                    ) : (
+                                                        'No file selected'
+                                                    )
+                                                ) : (
+                                                    <p>{formData?.[field.name] || 'N/A'}</p>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
-                                    <h4>Address and Property Details</h4>
-                                    {formData?.customerAddresses?.map((address, index) => (
-                                        <div key={index} className='review-content'>
-                                            {formConfig.sections[1].fields.map(field => (
-                                                <div key={field.name}>
-                                                    <strong>{field.placeholder}:</strong>
-                                                    {address[field.name] || 'N/A'}
+                                </div>
+                                <div>
+                                    <h3>Address and Property Details</h3>
+                                    {formData?.customerAddresses?.map((address, addressIndex) => (
+                                        <div key={addressIndex} className='review-content'>
+                                            {formConfig.sections[1].fields.map((field, fieldIndex) => (
+                                                <div key={field.name || `${addressIndex}-${fieldIndex}`} className="review-item">
+                                                    <strong>{field.placeholder}:</strong> <br />
+                                                    <p>{address[field.name] || 'N/A'}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -231,6 +249,7 @@ const Register = () => {
                                 <button type="submit" className="submit-button">Submit</button>
                             </div>
                         </div>
+
                     )}
 
                     <div className="form-navigation button-container">
