@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from "react-hook-form";
+import { NavLink } from 'react-router-dom';
+import { createUser } from '../../api/user';
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaQuestionCircle, FaAddressCard, FaCalendarDay } from 'react-icons/fa';
 import { CgClose } from "react-icons/cg";
 import './Register.css';
@@ -81,7 +83,13 @@ const Register = () => {
                 isPrimary: index === primaryPhone,
             })),
         };
-
+        
+        try {
+            const response = await createUser(updatedData);
+            console.log('User created successfully:', response);
+        } catch (error) {
+            console.error('Error creating user:', error);
+        }
         localStorage.setItem("formData", JSON.stringify(updatedData));
         console.log(updatedData);
     };
