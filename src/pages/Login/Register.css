@@ -228,6 +228,13 @@
     position: relative;
     margin-top: 20px;
 }
+.phone-section-wrapper{
+    border: 1px solid gray;
+    padding: 20px;
+    border-radius: 20px;
+    position: relative;
+    margin-top: 20px;
+}
 .review-item{
     margin-block: 20px;
 }

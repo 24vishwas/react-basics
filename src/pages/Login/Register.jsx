@@ -18,7 +18,7 @@ const formConfig = {
                 { name: "ssn", type: "text", placeholder: "SSN", validation: { required: true }, icon: "FaLock" },
                 { name: "profileImage", type: "file", placeholder: "Upload Profile Image", validation: { required: true }, icon: "FaUser" },
                 { name: "dob", type: "date", placeholder: "Date of Birth", validation: { required: true }, icon: 'FaCalendarDay' },
-                { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
+                // { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
             ],
         },
         {
@@ -42,13 +42,15 @@ const formConfig = {
         {
             title: "Customer Phone Details",
             fields: [
-                { name: "meterId", type: "text", placeholder: "Meter Id", validation: { required: true }, icon: "FaLock" },
-                { name: "isResBus", type: "select", placeholder: "Is Res Bus", options: ["R-Res", "B-small Business", "C-Commerce"], validation: { required: true }, icon: "FaQuestionCircle" },
-                { name: "tdsp", type: "text", placeholder: "TDSP", validation: { required: true }, icon: "FaLock" },
-                { name: "address1", type: "text", placeholder: "Address 1", validation: { required: true }, icon: "FaAddressCard" },
-                
+                { name: "phone id", type: "text", placeholder: "Phone Id", validation: { required: true }, icon: "FaLock" },
+                { name: "customer id", type: "text", placeholder: "Customer Id", validation: { required: true }, icon: "FaLock" },
+                { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
+
+                { name: "primary phone", type: "checkbox", placeholder: "Mark as Primary", validation: { required: true } },
+
             ],
         },
+
     ],
 };
 
@@ -60,28 +62,36 @@ const Register = () => {
         control,
         name: "customerAddresses",
     });
+    const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
+        control,
+        name: "customerPhones",
+    });
     const [primaryAddress, setPrimaryAddress] = useState(null);
+    const [primaryPhone, setPrimaryPhone] = useState(null);
 
     const onSubmit = async (data) => {
+        const updatedData = {
+            ...data,
+            customerAddresses: data.customerAddresses.map((address, index) => ({
+                ...address,
+                primary: index === primaryAddress,
+            })),
+            customerPhones: data.customerPhones.map((phone, index) => ({
+                ...phone,
+                isPrimary: index === primaryPhone,
+            })),
+        };
 
-        const updatedData = { ...data, customerAddresses: data.customerAddresses.map((address, index) => ({
-            ...address,
-            primary: index === primaryAddress, // Ensure only one primary address
-        })) };
-
-        localStorage.setItem("formData", JSON.stringify(data));
-        console.log(data);
+        localStorage.setItem("formData", JSON.stringify(updatedData));
+        console.log(updatedData);
     };
 
     const handleNext = async () => {
         const currentSection = formConfig.sections[currentStep].fields.map(field => field.name);
-        const valid = await trigger([...currentSection, `customerAddresses`]);
+        const valid = await trigger([...currentSection, `customerAddresses`, `customerPhones`]);
 
         if (valid) {
-            if (currentStep === 0 && addressFields.length === 0) {
-                // Optionally append a default address here
-            }
-            if (currentStep === formConfig.sections.length - 1) {
+            if (currentStep === formConfig.sections.length - 1 ) {
                 setFormData(getValues());
                 setCurrentStep(prevStep => prevStep + 1);
             } else {
@@ -119,6 +129,27 @@ const Register = () => {
         });
     };
 
+    // customer phone
+    const addMorePhone = () => {
+        appendPhone({});
+    };
+
+    const deletePhone = (index) => {
+        if (primaryPhone === index) {
+            alert("Primary phone cannot be deleted");
+            return;
+        }
+        if (confirm('Please confirm the delete')) {
+            removePhone(index);
+        }
+    };
+
+    const handlePrimaryPhoneChange = (index) => {
+        setPrimaryPhone(index);
+        phoneFields.forEach((_, i) => {
+            setValue(`customerPhones[${i}].primary`, i === index);
+        });
+    };
     const iconComponents = {
         FaUser: <FaUser />,
         FaLock: <FaLock />,
@@ -163,16 +194,16 @@ const Register = () => {
                                                                         type="checkbox"
                                                                         checked={primaryAddress === index}
                                                                         onChange={() => handlePrimaryChange(index)}
-                                                                        // {...register(`customerAddresses[${index}].primary`)}
+                                                                    // {...register(`customerAddresses[${index}].primary`)}
                                                                     />
-                                                                ) : 
-                                                                (
-                                                                    <input
-                                                                        type={field.type}
-                                                                        placeholder={field.placeholder}
-                                                                        {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
-                                                                    />
-                                                                )}
+                                                                ) :
+                                                                    (
+                                                                        <input
+                                                                            type={field.type}
+                                                                            placeholder={field.placeholder}
+                                                                            {...register(`customerAddresses.${index}.${field.name}`, field.validation)}
+                                                                        />
+                                                                    )}
                                                                 {errors?.customerAddresses?.[index]?.[field.name] && (
                                                                     <span className='error-note'>
                                                                         *{field.placeholder}* is mandatory
@@ -195,13 +226,72 @@ const Register = () => {
                                                         type="button"
                                                         className="delete-button"
                                                         onClick={() => deleteAddress(index)}
-                                                        // disabled={primaryAddress === index}
+                                                    // disabled={primaryAddress === index}
                                                     >
                                                         <CgClose />
                                                     </button>
                                                 </div>
                                             </div>
                                         ))
+                                    ) : sectionIndex === 2 ? (
+                                        <div className=''>
+                                            {/* <h3>{section.title}</h3> */}
+                                            <div className='form-section-wrapper'>
+                                                {phoneFields.map((item, index) => (
+                                                    <div key={item.id} className='phone-section-wrapper'>
+                                                        <div className="phone-section">
+                                                            {section.fields.map((field, fieldIndex) => (
+                                                                <div key={fieldIndex} className="fields-container">
+                                                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                                                    <div className="input-fields">
+                                                                        {field.icon && iconComponents[field.icon]}
+                                                                        {field.type === "select" ? (
+                                                                            <select
+                                                                                {...register(`customerPhones.${index}.${field.name}`, field.validation)}
+                                                                            >
+                                                                                {field.options.map((option, optIndex) => (
+                                                                                    <option key={optIndex} value={option}>
+                                                                                        {option}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </select>
+                                                                        ) : field.type === 'checkbox' ? (
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={primaryPhone === index}
+                                                                                onChange={() => handlePrimaryPhoneChange(index)}
+                                                                            />
+                                                                        ) : (
+                                                                            <input
+                                                                                type={field.type}
+                                                                                placeholder={field.placeholder}
+                                                                                {...register(`customerPhones.${index}.${field.name}`, field.validation)}
+                                                                            />
+                                                                        )}
+                                                                        {errors?.customerPhones?.[index]?.[field.name] && (
+                                                                            <span className='error-note'>
+                                                                                *{field.placeholder}* is mandatory
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <div className="phone-actions">
+                                                            <button
+                                                                type="button"
+                                                                className="delete-button"
+                                                                onClick={() => deletePhone(index)}
+                                                            >
+                                                                <CgClose />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                <button type="button" className='submit-button' onClick={addMorePhone}>Add More Phone</button>
+                                            </div>
+                                        </div>
+                                    
                                     ) : (
                                         section.fields.map((field, index) => (
                                             <div key={index} className="fields-container">
@@ -232,70 +322,90 @@ const Register = () => {
                                             </div>
                                         ))
                                     )}
+                                   
                                 </div>
                             </div>
                         ))
                     ) : (
                         <div className="form-section">
-                        <h2>Review Your Details</h2>
-                        <div className='review-section'>
-                            <div>
-                                <h3>Personal Details</h3>
-                                <div className='review-content'>
-                                    {formConfig.sections[0].fields.map((field, index) => (
-                                        <div className='review-item' key={field.name || index}>
-                                            <h3>{field.placeholder}:</h3>
-                                            {field.type === 'file' ? (
-                                                formData?.[field.name]?.[0] ? (
-                                                    <>
-                                                        <img
-                                                            src={URL.createObjectURL(formData[field.name][0])}
-                                                            alt={field.placeholder || "File Preview"}
-                                                            style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '10px' }}
-                                                        />
-                                                        <div>{formData[field.name][0].name}</div>
-                                                    </>
+                            <h2>Review Your Details</h2>
+                            <div className='review-section'>
+                                <div>
+                                    <h3>Personal Details</h3>
+                                    <div className='review-content'>
+                                        {formConfig.sections[0].fields.map((field, index) => (
+                                            <div className='review-item' key={field.name || index}>
+                                                <h3>{field.placeholder}:</h3>
+                                                {field.type === 'file' ? (
+                                                    formData?.[field.name]?.[0] ? (
+                                                        <>
+                                                            <img
+                                                                src={URL.createObjectURL(formData[field.name][0])}
+                                                                alt={field.placeholder || "File Preview"}
+                                                                style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '10px' }}
+                                                            />
+                                                            <div>{formData[field.name][0].name}</div>
+                                                        </>
+                                                    ) : (
+                                                        <p>No file selected</p>
+                                                    )
                                                 ) : (
-                                                    <p>No file selected</p>
-                                                )
-                                            ) : (
-                                                <p>{formData?.[field.name] || 'Not Provided'}</p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <h3>Address and Property Details</h3>
-                                {formData?.customerAddresses?.map((address, addressIndex) => (
-                                    <div key={addressIndex} className='review-content'>
-                                        {formConfig.sections[1].fields.map((field, fieldIndex) => (
-                                            <div key={field.name || `${addressIndex}-${fieldIndex}`} className="review-item">
-                                                <strong>{field.placeholder}:</strong>
-                                                <p>
-                                                    {field.type === 'checkbox' ? 
-                                                        (address[field.name] ? 'Yes' : 'No') 
-                                                        : address[field.name] || 'Not Provided'}
-                                                </p>
+                                                    <p>{formData?.[field.name] || 'Not Provided'}</p>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
-                                ))}
+                                </div>
+                                <div>
+                                    <h3>Address and Property Details</h3>
+                                    {formData?.customerAddresses?.map((address, addressIndex) => (
+                                        <div key={addressIndex} className='review-content'>
+                                            {formConfig.sections[1].fields.map((field, fieldIndex) => (
+                                                <div key={field.name || `${addressIndex}-${fieldIndex}`} className="review-item">
+                                                    <strong>{field.placeholder}:</strong>
+                                                    <p>
+                                                        {field.type === 'checkbox' ?
+                                                            (address[field.name] ? 'Yes' : 'No')
+                                                            : address[field.name] || 'Not Provided'}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div>
+                                    <h3>Phone Details</h3>
+                                    {formData?.customerPhones?.map((phone, phoneIndex) => (
+                                        <div key={phoneIndex} className='review-content'>
+                                            {formConfig.sections[2].fields.map((field, fieldIndex) => (
+                                                <div key={field.name || `${phoneIndex}-${fieldIndex}`} className="review-item">
+                                                    <strong>{field.placeholder}:</strong>
+                                                    <p>
+                                                        {field.type === 'checkbox' ?
+                                                            (phone[field.name] ? 'Yes' : 'No')
+                                                            : phone[field.name] || 'Not Provided'}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+
+                            </div>
+
+                            <div className="button-container">
+                                <button type="button" className="submit-button" onClick={handleEdit}>Edit</button>
+                                <button type="submit" className="submit-button">Submit</button>
                             </div>
                         </div>
-                        <div className="button-container">
-                            <button type="button" className="submit-button" onClick={handleEdit}>Edit</button>
-                            <button type="submit" className="submit-button">Submit</button>
-                        </div>
-                    </div>
-                    
+
                     )}
                     <div className='button-container'>
                         {currentStep > 0 && <button type="button" className='submit-button' onClick={handlePrevious}>Prev</button>}
-                        {currentStep < formConfig.sections.length && <button type="button" onClick={handleNext}>Next</button>}
+                        {currentStep < formConfig.sections.length && <button type="button" className='submit-button' onClick={handleNext}>Next</button>}
                         {/* {currentStep === formConfig.sections.length && <button type="submit">Submit</button>} */}
                         {/* {currentStep < formConfig.sections.length && <button type="button" onClick={handleEdit}>Edit</button>} */}
-                        {currentStep === 1 && <button type="button" onClick={addMoreAddress}>Add More Address</button>}
+                        {currentStep === 1 && <button type="button" className='submit-button' onClick={addMoreAddress}>Add More Address</button>}
                     </div>
                 </form>
             </div>
