@@ -38,17 +38,41 @@ const formConfig = {
                 { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
                 { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
                 { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
+                { name: "phone id", type: "text", placeholder: "Phone Id", validation: { required: true }, icon: "FaLock" },
                 { name: "primary", type: "checkbox", placeholder: "Mark as Primary", validation: { required: true } },
             ],
         },
         {
-            title: "Customer Phone Details",
+            title: "Electric Bill Details",
             fields: [
-                { name: "phone id", type: "text", placeholder: "Phone Id", validation: { required: true }, icon: "FaLock" },
-                { name: "customer id", type: "text", placeholder: "Customer Id", validation: { required: true }, icon: "FaLock" },
-                { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
+                //     { name: 'customerAddress',
+                //     type: 'select',
+                //     placeholder: 'Select Customer Address',
+                //     validation:{ required: true},
+                //     options: [customerAddresses]
+                // },
+                {
+                    name: 'dueDate',
+                    type: 'date',
+                    placeholder: 'Due Date',
+                    validation: { required: true },
+                    icon: "FaCalender"
+                },
+                {
+                    name: 'amount',
+                    type: 'number',
+                    placeholder: 'Amount in Dollars',
+                    validation: { required: true },
+                    icon: "FaCalender"
+                },
+                {
+                    name: 'paidStatus',
+                    type: 'checkbox',
+                    placeholder: 'Paid?',
+                    validation: { required: true },
+                    icon: "FaCalemder"
+                },
 
-                { name: "primary phone", type: "checkbox", placeholder: "Mark as Primary", validation: { required: true } },
 
             ],
         },
@@ -64,13 +88,14 @@ const Register = () => {
         control,
         name: "customerAddresses",
     });
-    const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
+    const { fields: electricBills, append: appendBills, remove: removeBills } = useFieldArray({
         control,
-        name: "customerPhones",
+        name: "customerBills",
     });
     const [primaryAddress, setPrimaryAddress] = useState(null);
-    const [primaryPhone, setPrimaryPhone] = useState(null);
-
+    // const [primaryPhone, setPrimaryPhone] = useState(null);
+    const customerAddresses = watch("customerAddresses");
+    console.log(customerAddresses);
     const onSubmit = async (data) => {
         const updatedData = {
             ...data,
@@ -78,12 +103,12 @@ const Register = () => {
                 ...address,
                 primary: index === primaryAddress,
             })),
-            customerPhones: data.customerPhones.map((phone, index) => ({
-                ...phone,
-                isPrimary: index === primaryPhone,
+            customerBills: data.customerBills.map((bills, index) => ({
+                ...bills,
+
             })),
         };
-        
+
         try {
             const response = await createUser(updatedData);
             console.log('User created successfully:', response);
@@ -96,13 +121,15 @@ const Register = () => {
 
     const handleNext = async () => {
         const currentSection = formConfig.sections[currentStep].fields.map(field => field.name);
-        const valid = await trigger([...currentSection, `customerAddresses`, `customerPhones`]);
+        const valid = await trigger([...currentSection, `customerAddresses`, `customerBills`]);
 
         if (valid) {
-            if (currentStep === formConfig.sections.length - 1 ) {
+            if (currentStep === formConfig.sections.length - 1) {
                 setFormData(getValues());
                 setCurrentStep(prevStep => prevStep + 1);
             } else {
+                setFormData(getValues());
+
                 setCurrentStep(prevStep => prevStep + 1);
             }
         }
@@ -138,26 +165,31 @@ const Register = () => {
     };
 
     // customer phone
-    const addMorePhone = () => {
-        appendPhone({});
+    const addMoreBills = () => {
+        appendBills({});
     };
 
-    const deletePhone = (index) => {
-        if (primaryPhone === index) {
-            alert("Primary phone cannot be deleted");
-            return;
-        }
+    const deleteBills = (index) => {
+
         if (confirm('Please confirm the delete')) {
-            removePhone(index);
+            removeBills(index);
         }
     };
 
-    const handlePrimaryPhoneChange = (index) => {
-        setPrimaryPhone(index);
-        phoneFields.forEach((_, i) => {
-            setValue(`customerPhones[${i}].primary`, i === index);
-        });
+    const getAvailableMeterIds = (index) => {
+        const selectedMeterIds = watch('customerBills')?.map(bill => bill.customerAddress) || [];
+
+        // Filter out already selected meterIds, except the one for the current index
+        return customerAddresses.filter(address =>
+            !selectedMeterIds.includes(address.meterId) || address.meterId === selectedMeterIds[index]
+        );
     };
+    // const handlePrimaryPhoneChange = (index) => {
+    //     setPrimaryPhone(index);
+    //     phoneFields.forEach((_, i) => {
+    //         setValue(`customerPhones[${i}].primary`, i === index);
+    //     });
+    // };
     const iconComponents = {
         FaUser: <FaUser />,
         FaLock: <FaLock />,
@@ -242,12 +274,29 @@ const Register = () => {
                                             </div>
                                         ))
                                     ) : sectionIndex === 2 ? (
-                                        <div className=''>
+                                        <>
                                             {/* <h3>{section.title}</h3> */}
-                                            <div className='form-section-wrapper'>
-                                                {phoneFields.map((item, index) => (
+                                          
+                                                {electricBills.map((item, index) => (
                                                     <div key={item.id} className='phone-section-wrapper'>
                                                         <div className="phone-section">
+                                                            <div className="fields-container">
+                                                                <label htmlFor={`customerAddress-${index}`}>Select Customer Address</label>
+                                                                <div className="input-fields">
+                                                                    <select
+                                                                        {...register(`customerBills.${index}.customerAddress`, { required: true })}
+                                                                        id={`customerAddress-${index}`}
+                                                                    >
+                                                                        <option value="">Select an address</option>
+                                                                        {getAvailableMeterIds(index).map((address, addressIndex) => (
+                                                                            <option key={addressIndex} value={address.meterId}>
+                                                                                {address.meterId}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
+                                                                  
+                                                                </div>
+                                                            </div>
                                                             {section.fields.map((field, fieldIndex) => (
                                                                 <div key={fieldIndex} className="fields-container">
                                                                     <label htmlFor={field.placeholder}>{field.placeholder}</label>
@@ -255,7 +304,7 @@ const Register = () => {
                                                                         {field.icon && iconComponents[field.icon]}
                                                                         {field.type === "select" ? (
                                                                             <select
-                                                                                {...register(`customerPhones.${index}.${field.name}`, field.validation)}
+                                                                                {...register(`customerBills.${index}.${field.name}`, field.validation)}
                                                                             >
                                                                                 {field.options.map((option, optIndex) => (
                                                                                     <option key={optIndex} value={option}>
@@ -263,20 +312,14 @@ const Register = () => {
                                                                                     </option>
                                                                                 ))}
                                                                             </select>
-                                                                        ) : field.type === 'checkbox' ? (
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                checked={primaryPhone === index}
-                                                                                onChange={() => handlePrimaryPhoneChange(index)}
-                                                                            />
                                                                         ) : (
                                                                             <input
                                                                                 type={field.type}
                                                                                 placeholder={field.placeholder}
-                                                                                {...register(`customerPhones.${index}.${field.name}`, field.validation)}
+                                                                                {...register(`customerBills.${index}.${field.name}`, field.validation)}
                                                                             />
                                                                         )}
-                                                                        {errors?.customerPhones?.[index]?.[field.name] && (
+                                                                        {errors?.customerBills?.[index]?.[field.name] && (
                                                                             <span className='error-note'>
                                                                                 *{field.placeholder}* is mandatory
                                                                             </span>
@@ -289,17 +332,17 @@ const Register = () => {
                                                             <button
                                                                 type="button"
                                                                 className="delete-button"
-                                                                onClick={() => deletePhone(index)}
+                                                                onClick={() => deleteBills(index)}
                                                             >
                                                                 <CgClose />
                                                             </button>
                                                         </div>
                                                     </div>
                                                 ))}
-                                                <button type="button" className='submit-button' onClick={addMorePhone}>Add More Phone</button>
-                                            </div>
-                                        </div>
-                                    
+
+                                           
+                                        </>
+
                                     ) : (
                                         section.fields.map((field, index) => (
                                             <div key={index} className="fields-container">
@@ -330,7 +373,7 @@ const Register = () => {
                                             </div>
                                         ))
                                     )}
-                                   
+
                                 </div>
                             </div>
                         ))
@@ -382,8 +425,8 @@ const Register = () => {
                                     ))}
                                 </div>
                                 <div>
-                                    <h3>Phone Details</h3>
-                                    {formData?.customerPhones?.map((phone, phoneIndex) => (
+                                    <h3>Bill Details</h3>
+                                    {formData?.customerBills?.map((phone, phoneIndex) => (
                                         <div key={phoneIndex} className='review-content'>
                                             {formConfig.sections[2].fields.map((field, fieldIndex) => (
                                                 <div key={field.name || `${phoneIndex}-${fieldIndex}`} className="review-item">
@@ -414,6 +457,7 @@ const Register = () => {
                         {/* {currentStep === formConfig.sections.length && <button type="submit">Submit</button>} */}
                         {/* {currentStep < formConfig.sections.length && <button type="button" onClick={handleEdit}>Edit</button>} */}
                         {currentStep === 1 && <button type="button" className='submit-button' onClick={addMoreAddress}>Add More Address</button>}
+                        {currentStep === 2 && <button type="button" className='submit-button' onClick={addMoreBills}>Add More Bills</button>}
                     </div>
                 </form>
             </div>
