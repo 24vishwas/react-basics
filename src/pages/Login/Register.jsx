@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from "react-hook-form";
 import { NavLink } from 'react-router-dom';
 import { createUser } from '../../api/user';
@@ -92,6 +92,7 @@ const Register = () => {
         control,
         name: "customerBills",
     });
+
     const [primaryAddress, setPrimaryAddress] = useState(null);
     // const [primaryPhone, setPrimaryPhone] = useState(null);
     const customerAddresses = watch("customerAddresses");
@@ -125,11 +126,12 @@ const Register = () => {
 
         if (valid) {
             if (currentStep === formConfig.sections.length - 1) {
+                
                 setFormData(getValues());
                 setCurrentStep(prevStep => prevStep + 1);
             } else {
                 setFormData(getValues());
-
+                console.log(currentStep)
                 setCurrentStep(prevStep => prevStep + 1);
             }
         }
@@ -184,6 +186,18 @@ const Register = () => {
             !selectedMeterIds.includes(address.meterId) || address.meterId === selectedMeterIds[index]
         );
     };
+
+    const [selectedAddress, setSelectedAddress] = useState({ meterId: null, address1: null });
+
+    const handleSelectAddress = (address) => {
+        setSelectedAddress({meterId: address.meterId,
+            address1: address.address1});
+        // addMoreBills();
+        // Set the selected address (meterId)
+    };
+
+    // Find the selected bill based on selectedAddress
+    const selectedBill = electricBills.find(item => item.meterId === selectedAddress);
     // const handlePrimaryPhoneChange = (index) => {
     //     setPrimaryPhone(index);
     //     phoneFields.forEach((_, i) => {
@@ -276,71 +290,100 @@ const Register = () => {
                                     ) : sectionIndex === 2 ? (
                                         <>
                                             {/* <h3>{section.title}</h3> */}
-                                          
-                                                {electricBills.map((item, index) => (
-                                                    <div key={item.id} className='phone-section-wrapper'>
-                                                        <div className="phone-section">
-                                                            <div className="fields-container">
-                                                                <label htmlFor={`customerAddress-${index}`}>Select Customer Address</label>
-                                                                <div className="input-fields">
-                                                                    <select
-                                                                        {...register(`customerBills.${index}.customerAddress`, { required: true })}
-                                                                        id={`customerAddress-${index}`}
-                                                                    >
-                                                                        <option value="">Select an address</option>
-                                                                        {getAvailableMeterIds(index).map((address, addressIndex) => (
-                                                                            <option key={addressIndex} value={address.meterId}>
-                                                                                {address.meterId}
-                                                                            </option>
-                                                                        ))}
-                                                                    </select>
-                                                                  
-                                                                </div>
+
+                                            <div className="form-container">
+                                                {/* Left side: Customer address list */}
+                                                <div className="address-list">
+                                                    <h3>Select Customer Address</h3>
+                                                    {customerAddresses && customerAddresses.length > 0 ? (
+                                                        customerAddresses.map((item) => (
+                                                            <div
+                                                                key={item.id}
+                                                                className={`address-card ${selectedAddress.meterId === item.meterId ? 'selected' : ''}`}
+                                                                onClick={() => handleSelectAddress(item)}
+                                                            >
+                                                                <h4>MeterID : {item.meterId}</h4>
+                                                                <h4> Address : {item.address1}</h4>
+
                                                             </div>
-                                                            {section.fields.map((field, fieldIndex) => (
-                                                                <div key={fieldIndex} className="fields-container">
-                                                                    <label htmlFor={field.placeholder}>{field.placeholder}</label>
-                                                                    <div className="input-fields">
-                                                                        {field.icon && iconComponents[field.icon]}
-                                                                        {field.type === "select" ? (
-                                                                            <select
-                                                                                {...register(`customerBills.${index}.${field.name}`, field.validation)}
-                                                                            >
-                                                                                {field.options.map((option, optIndex) => (
-                                                                                    <option key={optIndex} value={option}>
-                                                                                        {option}
-                                                                                    </option>
-                                                                                ))}
-                                                                            </select>
-                                                                        ) : (
-                                                                            <input
-                                                                                type={field.type}
-                                                                                placeholder={field.placeholder}
-                                                                                {...register(`customerBills.${index}.${field.name}`, field.validation)}
-                                                                            />
-                                                                        )}
-                                                                        {errors?.customerBills?.[index]?.[field.name] && (
-                                                                            <span className='error-note'>
-                                                                                *{field.placeholder}* is mandatory
-                                                                            </span>
-                                                                        )}
+                                                        ))
+                                                    ) : (
+                                                        <p>No addresses available.</p>
+                                                    )}
+                                                </div>
+
+                                                {/* Center: Bill form for selected address */}
+                                                <div className="bill-form">
+                                                    {selectedAddress ? (
+                                                        <>
+                                                            <h3>Bill for Address: {selectedAddress.address1} </h3>
+
+                                                            {electricBills.map((item, index) => (
+                                                                <div key={item.id} className='phone-section-wrapper'>
+                                                                    <div className="phone-section">
+                                                                        <div className="fields-container">
+                                                                            
+                                                                            <div className="input-fields">
+                                                                                <select hidden
+                                                                                    {...register(`customerBills.${index}.customerAddress`, { required: true })}
+                                                                                    id={`customerAddress-${index}`}
+                                                                                >
+                                                                                    <option value={selectedAddress.meterId}>Select an address</option>
+
+                                                                                </select>
+
+                                                                            </div>
+                                                                        </div>
+                                                                        {section.fields.map((field, fieldIndex) => (
+                                                                            <div key={fieldIndex} className="fields-container">
+                                                                                <label htmlFor={field.placeholder}>{field.placeholder}</label>
+                                                                                <div className="input-fields">
+                                                                                    {field.icon && iconComponents[field.icon]}
+                                                                                    {field.type === "select" ? (
+                                                                                        <select
+                                                                                            {...register(`customerBills.${index}.${field.name}`, field.validation)}
+                                                                                        >
+                                                                                            {field.options.map((option, optIndex) => (
+                                                                                                <option key={optIndex} value={option}>
+                                                                                                    {option}
+                                                                                                </option>
+                                                                                            ))}
+                                                                                        </select>
+                                                                                    ) : (
+                                                                                        <input
+                                                                                            type={field.type}
+                                                                                            placeholder={field.placeholder}
+                                                                                            {...register(`customerBills.${index}.${field.name}`, field.validation)}
+                                                                                        />
+                                                                                    )}
+                                                                                    {errors?.customerBills?.[index]?.[field.name] && (
+                                                                                        <span className='error-note'>
+                                                                                            *{field.placeholder}* is mandatory
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    <div className="phone-actions">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="delete-button"
+                                                                            onClick={() => deleteBills(index)}
+                                                                        >
+                                                                            <CgClose />
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ))}
-                                                        </div>
-                                                        <div className="phone-actions">
-                                                            <button
-                                                                type="button"
-                                                                className="delete-button"
-                                                                onClick={() => deleteBills(index)}
-                                                            >
-                                                                <CgClose />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                                        </>
+                                                    ) : (
+                                                        <p>Please select an address to fill in the bill details.</p>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                           
+
                                         </>
 
                                     ) : (

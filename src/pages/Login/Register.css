@@ -258,3 +258,22 @@
         justify-content: flex-start;
     }
 }
+
+/* bills */
+.form-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 20px;
+}
+.address-card {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.address-card.selected {
+    background-color: #f0f0f0;
+    border-color: #007bff;
+}
