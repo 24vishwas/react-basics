@@ -235,8 +235,26 @@
     position: relative;
     margin-top: 20px;
 }
+.review-card{
+    border: 1px solid gray;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.review-card h4{
+    margin: 0;
+}
+.review-content{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
 .review-item{
-    margin-block: 20px;
+    margin-block: 5px;
+    width: 33.333%;
+    min-width: 230px;
 }
 .review-item h3{
     font-size: 1rem;
@@ -247,12 +265,8 @@
     margin: 0;
     font-size: 0.8rem;
 }
-.review-section{
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-}
+
+
 @media (max-width:600px) {
     .review-section{
         justify-content: flex-start;
@@ -260,11 +274,40 @@
 }
 
 /* bills */
+.electric-usage-page{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+
+}
+.bill-section{
+    width: 100%;
+    min-width: 200px;
+    max-width: 600px;
+}
+.bill-form {
+    display: none;
+    width: 100%;
+    margin-inline: auto;
+}
+.bill-form.selected{
+    display: block;
+}
+.usage-fields-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 .form-container {
     display: flex;
     flex-direction: row;
     width: 100%;
     padding: 20px;
+}
+.address-list{
+    width: 400px;
 }
 .address-card {
     padding: 15px;
@@ -276,4 +319,19 @@
 .address-card.selected {
     background-color: #f0f0f0;
     border-color: #007bff;
+}
+.usage-fields{
+    
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.usage-fields select, .usage-fields input{
+    height: 35px;
+    margin-block: 5px;
+    font-size: 16px;
+    margin: 2px;
+    border-radius: 4px;
+    border: 1px solid grey;
+    padding-left: 20px;
 }
