@@ -29,8 +29,8 @@ const formConfig = {
                 { name: "meterId", type: "text", placeholder: "Meter Id", validation: { required: true }, icon: "FaLock" },
                 { name: "isResBus", type: "select", placeholder: "Is Res Bus", options: ["R-Res", "B-small Business", "C-Commerce"], validation: { required: true }, icon: "FaQuestionCircle" },
                 { name: "tdsp", type: "text", placeholder: "TDSP", validation: { required: true }, icon: "FaLock" },
-                { name: "address1", type: "text", placeholder: "Address 1", validation: { required: true }, icon: "FaAddressCard" },
-                { name: "address2", type: "text", placeholder: "Address 2", validation: { required: false }, icon: "FaAddressCard" },
+                { name: "addressline1", type: "text", placeholder: "Address Line 1", validation: { required: true }, icon: "FaAddressCard" },
+                { name: "addressline2", type: "text", placeholder: "Address Line 2", validation: { required: false }, icon: "FaAddressCard" },
                 { name: "city", type: "text", placeholder: "City", validation: { required: true }, icon: "FaAddressCard" },
                 { name: "state", type: "text", placeholder: "State", validation: { required: true }, icon: "FaAddressCard" },
                 { name: "country", type: "text", placeholder: "Country", validation: { required: true }, icon: "FaAddressCard" },
@@ -38,101 +38,96 @@ const formConfig = {
                 { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
                 { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
                 { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
-                { name: "phone type", type: "select", placeholder: "Phone type", options: ["Cell", "Work", "Home", "Fax"], validation: { required: true }, icon: "FaPhone" },
+                { name: "phone Type", type: "select", placeholder: "Phone type", options: ["Cell", "Work", "Home", "Fax"], validation: { required: true }, icon: "FaPhone" },
                 { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
-                { name: "primary", type: "checkbox", placeholder: "Mark as Primary", validation: { required: true } },
+                { name: "primary", type: "checkbox", placeholder: "Primary Address?", validation: { required: true } },
             ],
         },
         {
-            title: "Electric Bill Usages",
+            title: "Electric Usages Details",
             fields: [
-                //     { name: 'customerAddress',
-                //     type: 'select',
-                //     placeholder: 'Select Customer Address',
-                //     validation:{ required: true},
-                //     options: [customerAddresses]
-                // },
+              
                 {
                     name: 'January',
                     type: 'number',
-                    placeholder: 'Jan',
+                    placeholder: 'January',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'February',
                     type: 'number',
-                    placeholder: 'feb',
+                    placeholder: 'February',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'March',
                     type: 'number',
-                    placeholder: 'mar',
+                    placeholder: 'March',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'April',
                     type: 'number',
-                    placeholder: 'apr',
+                    placeholder: 'April',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'May',
                     type: 'number',
-                    placeholder: 'may',
+                    placeholder: 'May',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'June',
                     type: 'number',
-                    placeholder: 'jun',
+                    placeholder: 'June',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'July',
                     type: 'number',
-                    placeholder: 'jul',
+                    placeholder: 'July',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'August',
                     type: 'number',
-                    placeholder: 'aug',
+                    placeholder: 'August',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'September',
                     type: 'number',
-                    placeholder: 'sept',
+                    placeholder: 'September',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'October',
                     type: 'number',
-                    placeholder: 'oct',
+                    placeholder: 'October',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'November',
                     type: 'number',
-                    placeholder: 'nov',
+                    placeholder: 'November',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
                 {
                     name: 'December',
                     type: 'number',
-                    placeholder: 'dec',
+                    placeholder: 'December',
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
@@ -584,12 +579,13 @@ const Register = () => {
                                 <div className='review-card'>
                                     <h3>Address and Property Details</h3>
                                     {formData?.customerAddresses?.map((address, addressIndex) => (
-                                        <>
-                                            <h3>{addressIndex}.</h3>
+                                        <div className='review-container'>
+
                                         <div key={addressIndex} className='review-content'>
                                             {formConfig.sections[1].fields.map((field, fieldIndex) => (
                                                 <div key={field.name || `${addressIndex}-${fieldIndex}`} className="review-item">
                                                     <strong>{field.placeholder}:</strong>
+                                                    
                                                     <p>
                                                         {field.type === 'checkbox' ?
                                                             (address[field.name] ? 'Yes' : 'No')
@@ -598,16 +594,16 @@ const Register = () => {
                                                 </div>
                                             ))}
                                         </div>
-                                        </>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className='review-card'>
-                                    <h3>Bill Details</h3>
+                                    <h3>Usage Details</h3>
                                     {bills?.map((phone, phoneIndex) => (
-                                        <>
+                                        <div className='review-container'>
                                          {/* <h3>{phoneIndex}</h3> */}
                                          <h4>Meter ID : {phone.meterId}</h4>
-                                         <h4>Address : {phone.address1}</h4>
+                                         <h4>Address : {phone.addressline1}</h4>
                                         <div key={phoneIndex} className='review-content'>
                                             {formConfig.sections[2].fields.map((field, fieldIndex) => (
                                                 <div key={field.name || `${phoneIndex}-${fieldIndex}`} className="review-item">
@@ -620,7 +616,7 @@ const Register = () => {
                                                 </div>
                                             ))}
                                         </div>
-                                        </>
+                                        </div>
                                     ))}
                                 </div>
 
