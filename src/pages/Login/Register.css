@@ -187,7 +187,7 @@
     justify-content: center;
     gap: 10px;
     height: 50px;
-    background-color: rgb(1, 192, 135);
+    background-color: rgb(156, 14, 14);
     border: none;
     color: white;
     font-size: 1rem;
@@ -323,7 +323,7 @@
 .usage-fields{
     
     display: flex;
-    gap: 20px;
+    gap: 5px;
     align-items: center;
 }
 .usage-fields select, .usage-fields input{

@@ -38,7 +38,7 @@ const formConfig = {
                 { name: "houseType", type: "select", placeholder: "House Type", options: ["Apartment", "Villa", "Townhouse"] },
                 { name: "numRooms", type: "number", placeholder: "Number of Rooms", validation: { required: true } },
                 { name: "numEVs", type: "text", placeholder: "Number of EVs", validation: { required: true } },
-                { name: "phone type", type: "select", placeholder: "Phone type", options: ["Phone", "LandLine", "Home"], validation: { required: true }, icon: "FaPhone" },
+                { name: "phone type", type: "select", placeholder: "Phone type", options: ["Cell", "Work", "Home", "Fax"], validation: { required: true }, icon: "FaPhone" },
                 { name: "phone", type: "tel", placeholder: "Phone", validation: { required: true }, icon: "FaPhone" },
                 { name: "primary", type: "checkbox", placeholder: "Mark as Primary", validation: { required: true } },
             ],
@@ -108,6 +108,34 @@ const formConfig = {
                     validation: { required: false },
                     icon: "FaCalenderDay"
                 },
+                {
+                    name: 'September',
+                    type: 'number',
+                    placeholder: 'sept',
+                    validation: { required: false },
+                    icon: "FaCalenderDay"
+                },
+                {
+                    name: 'October',
+                    type: 'number',
+                    placeholder: 'oct',
+                    validation: { required: false },
+                    icon: "FaCalenderDay"
+                },
+                {
+                    name: 'November',
+                    type: 'number',
+                    placeholder: 'nov',
+                    validation: { required: false },
+                    icon: "FaCalenderDay"
+                },
+                {
+                    name: 'December',
+                    type: 'number',
+                    placeholder: 'dec',
+                    validation: { required: false },
+                    icon: "FaCalenderDay"
+                },
                
                
 
@@ -121,6 +149,8 @@ const formConfig = {
 const Register = () => {
     const { register, handleSubmit, control, watch, formState: { errors, isValid }, trigger, getValues, setValue } = useForm({ mode: 'onChange' });
     const [currentStep, setCurrentStep] = useState(0);
+    const [isAddressSectionInitialized, setIsAddressSectionInitialized] = useState(false);
+    const [personalDetails, setPersonalDetails] = useState({});
     const [formData, setFormData] = useState(null);
     const [bills, setBills] = useState([]);
     const { fields: addressFields, append, remove } = useFieldArray({
@@ -131,22 +161,34 @@ const Register = () => {
         control,
         name: "customerBills",
     });
-
+    // const { fields: personalFields } = useFieldArray({
+    //     control,
+    //     name: "personalDetails",
+    // });
+    
     const [primaryAddress, setPrimaryAddress] = useState(null);
     // const [primaryPhone, setPrimaryPhone] = useState(null);
     const customerAddresses = watch("customerAddresses");
+    
+   console.log(personalDetails)
     console.log(customerAddresses);
     const onSubmit = async (data) => {
+        // const personalDetails = data.personalDetails.reduce((acc, field) => {
+        //     const [key, value] = Object.entries(field)[0];
+        //     acc[key] = value;
+        //     return acc;
+        // }, {});
         const updatedData = {
-            ...data,
+            // ...data,
             customerAddresses: data.customerAddresses.map((address, index) => ({
                 ...address,
                 primary: index === primaryAddress,
             })),
             customerBills: bills.map((bills, index) => ({
                 ...bills,
-
             })),
+            personalDetails,
+            
         };
 
         try {
@@ -161,25 +203,63 @@ const Register = () => {
     };
 
     const handleNext = async () => {
-        const currentSection = formConfig.sections[currentStep].fields.map(field => field.name);
-        const valid = await trigger([...currentSection, `customerAddresses`, `customerBills`]);
+        const currentSection = formConfig.sections[0].fields.map(field => field.name);
+        // const valid = await trigger([...currentSection, `customerAddresses`, `customerBills`]);
+        let valid = false;
+        if(currentStep == 0){
+            valid = await trigger([...currentSection]);
+            if (!isAddressSectionInitialized) {
+                append({}); // Add one address field
+                setIsAddressSectionInitialized(true); // Mark section as initialized
+            }
+        }
+        if(currentStep == 1){
+             valid = await trigger('customerAddresses');
+            
+        }
+        if(currentStep == 2){
+             valid = await trigger([...currentSection,'customerBills']);
+        }
+        // var valid = true
         // setCurrentStep(prevStep => prevStep + 1);
-
+        
         if (valid) {
+            if(currentStep === 0){
+                // const personalinfo = watch('personalDetails')
+                // const personal = personalinfo.reduce((acc, field) => {
+                //     const [key, value] = Object.entries(field)[0];
+                //     acc[key] = value;
+                //     return acc;
+                // }, {});
+                const allValues = getValues();
+                const currentSectionValues = currentSection.reduce((acc, fieldName) => {
+                    if (allValues[fieldName] !== undefined) {
+                        acc[fieldName] = allValues[fieldName];
+                    }
+                    return acc;
+                }, {});
+                setPersonalDetails(currentSectionValues)
+                setCurrentStep(currentStep + 1);
+            }
             if (currentStep === formConfig.sections.length - 1) {
 
                 setFormData(getValues());
-                setCurrentStep(prevStep => prevStep + 1);
+                setCurrentStep(currentStep + 1);
+                console.log(personalDetails);
             } else {
-                setFormData(getValues());
+                setCurrentStep(currentStep + 1);
                 console.log(currentStep)
-                setCurrentStep(prevStep => prevStep + 1);
+                setFormData(getValues());
             }
+        }else{
+            console.log('error')
         }
     };
 
     const handlePrevious = () => {
-        setCurrentStep(prevStep => prevStep - 1);
+        setCurrentStep(currentStep - 1);
+        console.log(currentStep)
+        
     };
 
     const handleEdit = () => {
@@ -291,7 +371,7 @@ const Register = () => {
                                 <div className='form-section-wrapper'>
                                     {sectionIndex === 1 ? (
                                         addressFields.map((item, index) => (
-                                            <div key={item.id} className='customer-section-wrapper'>
+                                            <div key={index} className='customer-section-wrapper'>
                                                 <div className="address-section">
                                                     {section.fields.map((field, fieldIndex) => (
                                                         <div key={fieldIndex} className="fields-container">
@@ -352,8 +432,8 @@ const Register = () => {
                                                 </div>
                                             </div>
                                         ))
-                                    ) : sectionIndex === 2 ? (
-                                        <div className='electric-usage-page'>
+                                        ) : sectionIndex === 2 ? (
+                                            <div className='electric-usage-page'>
                                             {/* <h3>{section.title}</h3> */}
 
                                             <div className="address-list">
@@ -363,11 +443,13 @@ const Register = () => {
                                                         <div
                                                             key={item.id}
                                                             className={`address-card ${selectedAddress.meterId === item.meterId ? 'selected' : ''}`}
-                                                            onClick={() => handleSelectAddress(item)}
+                                                            
                                                         >
                                                             <h4>MeterID : {item.meterId}</h4>
                                                             <h4> Address : {item.address1}</h4>
-
+                                                        <button className='prev-button' onClick={() => handleSelectAddress(item)}>
+                                                            Add Usage
+                                                        </button>
                                                         </div>
                                                     ))
                                                 ) : (
@@ -409,7 +491,7 @@ const Register = () => {
                                 placeholder={field.placeholder}
                                                                         />
                                                                     )}
-                                                                     in units
+                                                                    units
                                                                 </div>
                                                             </div>
                                                         ))}
@@ -463,7 +545,7 @@ const Register = () => {
                                             </div>
                                         ))
                                     )}
-
+                                
                                 </div>
                             </div>
                         ))
@@ -471,32 +553,34 @@ const Register = () => {
                         <div className="form-section">
                             <h2>Review Your Details</h2>
                             <div className='review-section'>
-                                <div className='review-card'>
+                            <div className='review-card'>
                                     <h3>Personal Details</h3>
                                     <div className='review-content'>
                                         {formConfig.sections[0].fields.map((field, index) => (
                                             <div className='review-item' key={field.name || index}>
                                                 <h3>{field.placeholder}:</h3>
                                                 {field.type === 'file' ? (
-                                                    formData?.[field.name]?.[0] ? (
+                                                    personalDetails[field.name]?.[0] ? (
                                                         <>
                                                             <img
-                                                                src={URL.createObjectURL(formData[field.name][0])}
+                                                                src={URL.createObjectURL(personalDetails[field.name][0])}
                                                                 alt={field.placeholder || "File Preview"}
                                                                 style={{ width: '200px', height: 'auto', objectFit: 'cover', borderRadius: '10px' }}
                                                             />
-                                                            <div>{formData[field.name][0].name}</div>
+                                                            <div>{personalDetails[field.name][0].name}</div>
                                                         </>
                                                     ) : (
                                                         <p>No file selected</p>
                                                     )
                                                 ) : (
-                                                    <p>{formData?.[field.name] || 'Not Provided'}</p>
+                                                    <p>{personalDetails[field.name] || 'Not Provided'}</p>
                                                 )}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
+           
+                
                                 <div className='review-card'>
                                     <h3>Address and Property Details</h3>
                                     {formData?.customerAddresses?.map((address, addressIndex) => (
@@ -549,13 +633,14 @@ const Register = () => {
                         </div>
 
                     )}
+                    {/* {currentStep === 1 && <button type="button" className='prev-button' onClick={addMoreAddress}>Add More Address</button>} */}
                     <div className='button-container'>
                         {currentStep > 0 && <button type="button" className='submit-button' onClick={handlePrevious}>Prev</button>}
                         {currentStep < formConfig.sections.length && <button type="button" className='submit-button' onClick={handleNext}>Next</button>}
                         {/* {currentStep === formConfig.sections.length && <button type="submit">Submit</button>} */}
                         {/* {currentStep < formConfig.sections.length && <button type="button" onClick={handleEdit}>Edit</button>} */}
-                        {currentStep === 1 && <button type="button" className='submit-button' onClick={addMoreAddress}>Add More Address</button>}
-                        {currentStep === 2 && <button type="button" className='submit-button' onClick={addMoreBills}>Add More Bills</button>}
+                        {currentStep === 1 && <button type="button" className='prev-button' onClick={addMoreAddress}>Add More Address</button>}
+                        {/* {currentStep === 2 && <button type="button" className='submit-button' onClick={addMoreBills}>Add More Bills</button>} */}
                     </div>
                 </form>
             </div>
